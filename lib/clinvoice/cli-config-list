@@ -1,0 +1,10 @@
+#autoload -U
+#vim: set ft=zsh 
+#
+# display the contents of the config files
+
+cli-config-read
+
+for key in ${(k)conf} ; do
+        echo $key=${conf[$key]}
+done

@@ -1,0 +1,34 @@
+#autoload -U
+#vim: set ft=zsh 
+#
+# Read config files and store result in ${conf} associative array.
+# To access the config data use ${conf[variable]}.
+
+RE_MATCH_PCRE=1
+zmodload zsh/pcre
+
+# use environment variables, or sane default values
+: ${CLI_GLOBAL_CONF="$HOME/.clinvoice"}
+: ${CLI_LOCAL_CONF=".clinvoice"}
+
+function read_conf_file() {
+        local config="$1"
+        local section=
+        while read line ; do
+                #echo "# $line"
+                if [[ "$line" =~ "\[([a-z0-9]+)\]" ]] ; then
+                        section=${match[1]}
+
+                elif [[ "$line" =~ "^\s*([a-z0-9]+)\s*=\s*(.*)$" ]] ; then
+                        local var="$section.${match[1]}"
+                        local val="${match[2]}"
+                        conf[$var]="$val"
+                fi
+        done < "$config"
+}
+
+declare -g -A conf
+
+for file in "$CLI_GLOBAL_CONF" "$CLI_LOCAL_CONF" ; do
+        [[ -f "$file" ]] && read_conf_file "$file"
+done

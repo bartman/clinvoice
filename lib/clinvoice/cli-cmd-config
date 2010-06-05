@@ -1,4 +1,32 @@
 #autoload -U
 #vim: set ft=zsh 
 
-die "$cli_cmd_name not implemented yet"
+function cli-config-help() {
+        cli-help-print-header
+        cat <<END
+
+cli config [options...]
+
+Options:
+
+ -l --list    - list all config options
+
+END
+}
+
+# if is no more to parse, bail now
+[[ ${#argv} = 0 ]] && cli-config-help 1
+
+# parse local parameters
+while [[ -n "$1" && "${1[1]}" = "-" ]] ; do
+        opt=$1 ; shift
+        case "$opt" in
+            -l|--list)
+                cli-config-list
+                exit 0
+                ;;
+            *)
+                die "unknown config option '$opt'"
+                ;;
+        esac
+done

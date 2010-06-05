@@ -1,0 +1,13 @@
+#autoload -U
+#vim: set ft=zsh 
+
+cli-help-print-header
+cat <<END
+
+cli config [options...]
+
+Options:
+
+ -l --list    - list all config options
+
+END
