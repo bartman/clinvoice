@@ -1,0 +1,36 @@
+#!/bin/zsh
+# Copyright (c) 2010 Bart Trojanowski <bart@jukie.net>
+
+# CLI uses autoload to load functions defined in a lib subdirectory.
+# This code finds that directory and sets functions for autoload.
+if [[ -z "${CLI_LIB_DIR}" ]] ; then
+        CLI_LIB_DIR=$(dirname $0)/lib/clinvoice
+fi
+fpath=(${CLI_LIB_DIR} $fpath)
+for file in ${CLI_LIB_DIR}/*[^~] ; do
+        autoload -U ${file##*/}
+done
+
+# parse global parameters
+while [[ -n "$1" && "${1[1]}" = "-" ]] ; do
+        opt=$1 ; shift
+        case "$opt" in
+            -h|--help)
+                cli-cmd-help
+                ;;
+            *)
+                die "unknown global option '$opt'"
+                ;;
+        esac
+done
+
+# if is no more to parse, bail now
+[[ ${#argv} = 0 ]] && cli-cmd-help 1
+
+# handle the command
+name="$1" ; shift
+cmd="cli-cmd-$name"
+
+( whence -w "$cmd" >/dev/null 2>&1 ) || die "unknown command '$name'"
+
+"$cmd" ${*}

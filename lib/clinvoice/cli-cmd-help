@@ -1,0 +1,23 @@
+#autoload -U
+#vim: set ft=zsh 
+
+local err=${1:-0}
+local out=1                 # stdout
+[[ "$err" -ne 0 ]] && out=2 # stderr
+
+cat >&"$out" <<END
+cli - CLInvoice
+
+  cli <command> [options...]
+
+Commands:
+
+  commit      - create a snapshot
+  help        - you're reading it
+  init        - initialize a new repository
+  log         - show history of project
+  pdf         - generate a pdf
+
+END
+
+exit $err
