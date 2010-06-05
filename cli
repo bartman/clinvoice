@@ -4,7 +4,21 @@
 # CLI uses autoload to load functions defined in a lib subdirectory.
 # This code finds that directory and sets functions for autoload.
 if [[ -z "${CLI_LIB_DIR}" ]] ; then
-        CLI_LIB_DIR=$(dirname $0)/lib/clinvoice
+echo "# 0 $0"
+        local dir0=${0%/*}
+        local dirL=${$(readlink -f $0)%/*}
+        local sfx=lib/clinvoice
+        trydirs=( $dir0/$sfx $dir0/../$sfx $dirL/$sfx $dirL/../$sfx )
+        for dir in $trydirs ; do
+                if [[ -d $dir ]] ; then
+                        CLI_LIB_DIR=$dir
+                        break
+                fi
+        done
+        if [[ -z "${CLI_LIB_DIR}" ]] ; then
+                echo >&2 "could not find clinvoice lib files, set CLI_LIB_DIR"
+                exit 1
+        fi
 fi
 fpath=(${CLI_LIB_DIR} $fpath)
 for file in ${CLI_LIB_DIR}/*[^~] ; do
