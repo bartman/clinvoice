@@ -1,0 +1,23 @@
+# this part would usually be a system wide config in $HOME/.clinvoice
+[issuer]
+    company     = BURN-E
+    address     = 1 Main Ave | Ottawa, ON, K2C 4E6 | Canada
+    phone       = 613-282-7102
+
+# and the rest would live in this file (in the project dir)
+[client]
+    care-of     = Shelby Forthright
+    company     = Buy N Large
+    address     = 1 Buy n Large Plaza, BnL Ave. | Largefield, NJ, 08012 | USA
+    phone       = 201-555-0001
+
+[contract]
+    hourly-rate = 50
+    tax         = HST 13%
+
+[latex]
+    template    = bnl-template.tex
+
+[pdf]
+    # template for generated file names
+    output      = bnl-YYYYMMDD-SEQ.pdf
