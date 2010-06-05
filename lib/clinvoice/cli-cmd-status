@@ -1,0 +1,30 @@
+#autoload -U
+#vim: set ft=zsh 
+
+# parse local options
+while [[ -n "$1" && "${1[1]}" = "-" ]] ; do
+        opt=$1 ; shift
+        case "$opt" in
+            -h|--list)
+                cli-status-help 0
+                ;;
+            *)
+            die "unknown config option '$opt'"
+                ;;
+        esac
+done
+
+# following that are date specs
+typeset -g -A cli_dataspec
+
+while [[ -n "$1" ]] ; do
+        local opt=$1 ; shift
+        local spec=$(normalize-datespec "$opt")
+        [[ -z "$spec" ]] && die "invalid date spec '$opt'"
+        cli_datespec=( $cli_datespec $spec )
+done
+
+# if there is no date spec, use today
+[[ $#cli_datespec = 0 ]] && cli_datespec=( $(date '+%Y.%m.%d') )
+
+echo "TODO: show stuff matching $cli_datespec"

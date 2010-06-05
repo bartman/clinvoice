@@ -1,0 +1,19 @@
+#autoload -U
+#vim: set ft=zsh 
+#
+# Read in a date spec, and return something that looks like YYYY.MM.DD
+
+local txt=$1
+
+if [[ $txt =~ "^(20[0-9]{2})[./-]?([01][0-9])[./-]?([0-3][0-9])$" ]] ; then
+        echo ${match[1]}.${match[2]}.${match[3]}
+
+elif [[ $txt =~ "^(20[0-9]{2})[./-]?([01][0-9])$" ]] ; then
+        echo "${match[1]}.${match[2]}.*"
+
+elif [[ $txt =~ "^(20[0-9]{2})$" ]] ; then
+        echo "${match[1]}.*.*"
+
+fi
+
+return 1
