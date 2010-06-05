@@ -3,7 +3,7 @@
 #
 # display the contents of the config files
 
-cli-config-read
+read-config
 
 for key in ${(k)conf} ; do
         echo $key=${conf[$key]}
