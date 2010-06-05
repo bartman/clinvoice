@@ -5,8 +5,8 @@ local err=${1:-0}
 local out=1                 # stdout
 [[ "$err" -ne 0 ]] && out=2 # stderr
 
+cli-help-print-header
 cat >&"$out" <<END
-cli - CLInvoice
 
   cli <command> [options...]
 
