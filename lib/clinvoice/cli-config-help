@@ -1,8 +1,12 @@
 #autoload -U
 #vim: set ft=zsh 
 
-cli-help-print-header
-cat <<END
+local err=${1:-0}
+local out=1                 # stdout
+[[ "$err" -ne 0 ]] && out=2 # stderr
+
+cli-help-print-header >&$out
+cat >&$out <<END
 
 cli config [options...]
 
@@ -11,3 +15,4 @@ Options:
  -l --list    - list all config options
 
 END
+exit $err
