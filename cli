@@ -4,7 +4,6 @@
 # CLI uses autoload to load functions defined in a lib subdirectory.
 # This code finds that directory and sets functions for autoload.
 if [[ -z "${CLI_LIB_DIR}" ]] ; then
-echo "# 0 $0"
         local dir0=${0%/*}
         local dirL=${$(readlink -f $0)%/*}
         local sfx=lib/clinvoice
