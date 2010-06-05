@@ -28,9 +28,9 @@ done
 [[ ${#argv} = 0 ]] && cli-cmd-help 1
 
 # handle the command
-name="$1" ; shift
-cmd="cli-cmd-$name"
+cli_cmd_name="$1" ; shift
+cmd="cli-cmd-$cli_cmd_name"
 
-( whence -w "$cmd" >/dev/null 2>&1 ) || die "unknown command '$name'"
+( whence -w "$cmd" >/dev/null 2>&1 ) || die "unknown command '$cli_cmd_name'"
 
 "$cmd" ${*}

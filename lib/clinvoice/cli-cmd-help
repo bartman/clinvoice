@@ -13,6 +13,7 @@ cli - CLInvoice
 Commands:
 
   commit      - create a snapshot
+  config      - configuration
   help        - you're reading it
   init        - initialize a new repository
   log         - show history of project

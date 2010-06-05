@@ -1,0 +1,4 @@
+#autoload -U
+#vim: set ft=zsh 
+
+die "$cli_cmd_name not implemented yet"
