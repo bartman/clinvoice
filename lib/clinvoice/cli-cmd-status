@@ -15,16 +15,29 @@ while [[ -n "$1" && "${1[1]}" = "-" ]] ; do
 done
 
 # following that are date specs
-typeset -g -A cli_dataspec
+typeset -g -a datespec
 
 while [[ -n "$1" ]] ; do
         local opt=$1 ; shift
         local spec=$(normalize-datespec "$opt")
         [[ -z "$spec" ]] && die "invalid date spec '$opt'"
-        cli_datespec=( $cli_datespec $spec )
+        datespec=( $datespec $spec )
 done
 
 # if there is no date spec, use today
-[[ $#cli_datespec = 0 ]] && cli_datespec=( $(date '+%Y.%m.%d') )
+[[ $#datespec = 0 ]] && datespec=( $(date '+%Y.%m.%d') )
 
-echo "TODO: show stuff matching $cli_datespec"
+# read in all the data
+read-cli-files *.cli
+
+# dump the data
+for day in ${(k)daytext} ; do
+        local time=${dayhours[$day]}
+
+        echo "$day  (${time}h)"
+
+        lines=( ${(s::Q)daytext[$day]} )
+        for n in $lines ; do 
+                echo "    $n"
+        done
+done
