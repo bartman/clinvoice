@@ -20,9 +20,9 @@ Commands:
   commit      - create a snapshot
   config      - configuration
   help        - you're reading it
+  generate    - generate an output file
   init        - initialize a new repository
   log         - show history of project
-  pdf         - generate a pdf
   status      - print current month
 
 END
