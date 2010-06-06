@@ -1,4 +1,48 @@
 #autoload -U
 #vim: set ft=zsh 
 
-die "$cli_cmd_name not implemented yet"
+typeset -g log_format=
+
+# parse local options
+while [[ -n "$1" && "${1[1]}" = "-" ]] ; do
+        opt=$1 ; shift
+        case "$opt" in
+            -h|--list)
+                cli-log-help 0
+                ;;
+            -f)
+                arg_format=$1
+                shift || die "-f requires an argument"
+                ;;
+            --format=*)
+                arg_format=${opt#--format=}
+                ;;
+            *)
+            die "unknown config option '$opt'"
+                ;;
+        esac
+done
+
+# validate the format argument
+log_print=cli-log-format-default
+[[ -n "$arg_format" ]] && log_print="cli-log-format-$arg_format"
+( whence -w "$log_print" >/dev/null 2>&1 ) || die "unknown format '$arg_format'"
+
+# following that are date specs
+typeset -g -a datespec
+
+while [[ -n "$1" ]] ; do
+        local opt=$1 ; shift
+        local spec=$(normalize-datespec "$opt")
+        [[ -z "$spec" ]] && die "invalid date spec '$opt'"
+        datespec=( $datespec $spec )
+done
+
+# if there is no date spec, use today
+[[ $#datespec = 0 ]] && datespec=( $(date '+%Y.%m.%d') )
+
+# read in all the data
+read-cli-files *.cli
+
+# dump the data
+$log_print
