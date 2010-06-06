@@ -24,6 +24,9 @@ for file in ${CLI_LIB_DIR}/*[^~] ; do
         autoload -U ${file##*/}
 done
 
+# global defaults
+typeset -g CLI_DIR=.
+
 # parse global parameters
 while [[ -n "$1" && "${1[1]}" = "-" ]] ; do
         opt=$1 ; shift
@@ -31,11 +34,21 @@ while [[ -n "$1" && "${1[1]}" = "-" ]] ; do
             -h|--help)
                 cli-cmd-help
                 ;;
+            -d)
+                CLI_DIR=$1
+                shift 2>/dev/null || die "cil -d requires an argument"
+                ;;
+            --db-dir=*)
+                CLI_DIR=${opt#--db-dir=}
+                ;;
             *)
                 die "unknown global option '$opt'"
                 ;;
         esac
 done
+
+# validate options
+[[ -d "$CLI_DIR" ]] || die "No such directory: $CLI_DIR"
 
 # if is no more to parse, bail now
 [[ ${#argv} = 0 ]] && cli-cmd-help 1

@@ -42,7 +42,7 @@ done
 [[ $#datespec = 0 ]] && datespec=( $(date '+%Y.%m.%d') )
 
 # read in all the data
-read-cli-files *.cli
+read-cli-files $CLI_DIR/*.cli
 
 # dump the data
 $log_print

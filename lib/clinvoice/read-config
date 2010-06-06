@@ -9,7 +9,7 @@ zmodload zsh/pcre
 
 # use environment variables, or sane default values
 : ${CLI_GLOBAL_CONF="$HOME/.clinvoice"}
-: ${CLI_LOCAL_CONF=".clinvoice"}
+: ${CLI_LOCAL_CONF="$CLI_DIR/.clinvoice"}
 
 function read_conf_file() {
         local config="$1"

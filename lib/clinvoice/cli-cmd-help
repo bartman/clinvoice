@@ -8,7 +8,12 @@ local out=1                 # stdout
 cli-help-print-header >&$out
 cat >&$out <<END
 
-  cli <command> [options...]
+  cli [options...] <command> [command options...]
+
+Global options:
+
+  -d --db-dir=<dir>    - config and data storage
+  -h --help            - print this help
 
 Commands:
 
