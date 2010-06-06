@@ -16,8 +16,23 @@
     tax         = HST 13%
 
 [latex]
+    # template file to read in to generate output
     template    = bnl-template.tex
+    # output to generate, witht he following substitutions:
+    #   %% - a literal %
+    #   %# - sequence number
+    #   %Y - year
+    #   %m - last month in invoice
+    #   %d - last day in invoice
+    output      = bnl-%Y%m%d-%#.tex
+
+[txt]
+    template    = bnl-template.txt
+    output      = bnl-%Y%m%d-%#.txt
 
 [pdf]
-    # template for generated file names
-    output      = bnl-YYYYMMDD-SEQ.pdf
+    template    = bnl-template.tex
+    output      = bnl-%Y%m%d-%#.tex
+    # rendering is done by calling this program, substituting %s for 'output' above
+    build       = latex %s
+

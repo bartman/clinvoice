@@ -31,6 +31,11 @@ Here is an example of a system config file:
         address     = 1 Main Ave | Ottawa, ON, K2C 4E6 | Canada
         phone       = 613-282-7102
 
+    [pdf]
+        # rendering is done by calling this program, substituting %s for
+        # 'pdf.output' (see below)
+        build       = latex %s
+
 Here is what you'd find in a project config file:
 
     [client]
@@ -44,11 +49,23 @@ Here is what you'd find in a project config file:
         tax         = HST 13%
 
     [latex]
+        # template file to read in to generate output
         template    = bnl-template.tex
+        # output to generate, witht he following substitutions:
+        #   %% - a literal %
+        #   %# - sequence number
+        #   %Y - year
+        #   %m - last month in invoice
+        #   %d - last day in invoice
+        output      = bnl-%Y%m%d-%#.tex
+
+    [txt]
+        template    = bnl-template.txt
+        output      = bnl-%Y%m%d-%#.txt
 
     [pdf]
-        # template for generated file names
-        output      = bnl-YYYYMMDD-SEQ.pdf
+        template    = bnl-template.tex
+        output      = bnl-%Y%m%d-%#.tex
 
 But it doesn't matter how the configuration is split, or if it's split at all.
 
