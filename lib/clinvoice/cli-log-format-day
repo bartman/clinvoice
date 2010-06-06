@@ -1,0 +1,17 @@
+#autoload -U
+#vim: set ft=zsh 
+#
+# this function outputs the daily summary output
+
+local total=0
+
+for day in ${(k)dayhours} ; do
+        local time=${dayhours[$day]}
+
+        printf "$day  %4d\n" $time
+
+        let "total=$total + $time"
+done
+
+printf "Total:      %4d\n" $total
+

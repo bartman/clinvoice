@@ -18,10 +18,9 @@ Formats:
 
  full     - print everything
  default  - daily itemized output
- daily    - daily summary
- weekly   - weekly summary
- monthly  - monthly summary
- anual    - anual summary
+ day      - daily summary
+ month    - monthly summary
+ year     - anual summary
 
 END
 exit $err

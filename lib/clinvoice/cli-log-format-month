@@ -1,0 +1,41 @@
+#autoload -U
+#vim: set ft=zsh 
+#
+# this function outputs the montly summary output
+
+local ttl_time=0
+local ttl_cnt=0
+local m_spec=
+local m_time=0
+local m_count=0
+
+function print_month() {
+        [[ -z "$m_spec" ]] && return
+        printf "$month     %4d  (%d days)\n" $m_time $m_count
+        let "ttl_cnt=$ttl_cnt+1"
+}
+
+for day in ${(k)dayhours} ; do
+        local time=${dayhours[$day]}
+        local month=${day%.*}
+
+        if [[ "$m_spec" != "$month" ]] ; then
+                # print the previous entry
+                print_month
+
+                # reset for the next entry
+                m_spec="$month"
+                m_time="$time"
+                m_count=1
+        else
+                let "m_time=$m_time + $time"
+                let "m_count=$m_count + 1"
+        fi
+
+        let "ttl_time=$ttl_time + $time"
+done
+
+# print the last entry
+print_month
+
+[[ $ttl_cnt -gt 1 ]] && printf "Total:      %4d\n" $ttl_time
