@@ -1,0 +1,60 @@
+#autoload -U
+#vim: set ft=zsh 
+
+RE_MATCH_PCRE=1
+zmodload zsh/pcre
+
+read-config
+
+local err=${1:-0}
+local out=1                 # stdout
+[[ "$err" -ne 0 ]] && out=2 # stderr
+
+cli-help-print-header >&$out
+cat >&$out <<END
+
+cli generate [options...] [ <date spec> ]
+
+Options:
+
+ -t --type=<format>   - type of generator to use
+
+Configured generators:
+
+END
+
+local -a gen_names
+local    gen_name_max_len=8
+local -A gen_template
+local -A gen_output
+local -A gen_build
+
+for key in ${(k)conf} ; do
+        if [[ $key =~ "^generator\.([a-z0-9A-Z_-]+)\.([a-z0-9A-Z_-]+)$" ]] ; then
+                local name=${match[1]}
+                [[ $gen_name_max_len -lt ${#name} ]] && gen_name_max_len=$name
+                gen_names+=($name)
+                local what=${match[2]}
+                case $what in
+                template) gen_template[$name]=${conf[$key]} ;;
+                output)   gen_output[$name]=${conf[$key]} ;;
+                build)    gen_build[$name]=${conf[$key]} ;;
+                esac
+        fi
+done
+
+for name in ${(ou)gen_names} ; do
+        printf "  %-${gen_name_max_len}s" $name
+        if [[ -n "${gen_template[$name]}" && -n "${gen_output[$name]}" ]] ; then
+                printf "- %s -> %s" "${gen_template[$name]}" "${gen_output[$name]}"
+                if [[ -n "${gen_build[$name]}" ]] ; then
+                        printf ", then call '%s'" "${gen_build[$name]}"
+                fi
+        else
+                printf "- (need to configure template and output)"
+        fi
+        echo
+done
+echo
+
+exit $err

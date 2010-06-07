@@ -1,4 +1,63 @@
 #autoload -U
 #vim: set ft=zsh 
 
-die "$cli_cmd_name not implemented yet"
+# parse local options
+while [[ -n "$1" && "${1[1]}" = "-" ]] ; do
+        opt=$1 ; shift
+        case "$opt" in
+            -h|--list)
+                cli-generate-help 0
+                ;;
+            -t)
+                arg_type=$1
+                shift 2>/dev/null || die "generate -t requires an argument"
+                ;;
+            --type=*)
+                arg_type=${opt#--type=}
+                ;;
+            *)
+            die "unknown config option '$opt'"
+                ;;
+        esac
+done
+
+read-config
+
+# validate the type argument
+[[ -n "$arg_type" ]] || die "you must specify an output type"
+[[ -n "${conf[generator.$arg_type.template]}" && -n "${conf[generator.$arg_type.output]}" ]] \
+|| die "Generator '$arg_type' is missconfigured.  A complete definition looks like this:
+
+    [generator \"name\"]
+        template = some-file
+        output   = invoice-%Y%m%d-%#.out
+
+You can fix this by editing your .clinvoice config file."
+
+# make sure that template exists
+local template_file="$CLI_DIR/${conf[generator.$arg_type.template]}"
+[[ -f "$template_file" ]] || die "template files doesn't exist: $template_file"
+
+# following that are date specs
+typeset -g -a datespec
+
+while [[ -n "$1" ]] ; do
+        local opt=$1 ; shift
+        local spec=$(normalize-datespec "$opt")
+        [[ -z "$spec" ]] && die "invalid date spec '$opt'"
+        datespec=( $datespec $spec )
+done
+
+# if there is no date spec, use today
+[[ $#datespec = 0 ]] && datespec=( $(date '+%Y.%m.%d') )
+
+# read in all the data
+read-cli-files $CLI_DIR/*.cli
+
+[[ ${#dayhours} = 0 ]] && die "no entries found"
+
+# generate output file name based on intput data
+local output_file=$(generate-name "${conf[generator.$arg_type.output]}")
+
+# dump the data
+generate-output "$template_file" "$output_file"

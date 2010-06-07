@@ -1,0 +1,7 @@
+#autoload -U
+#vim: set ft=zsh 
+#
+# This function takes as arguments a template file name and an output
+# file name.  It processes the template to generate the result.
+
+cat "$1" > "$2"

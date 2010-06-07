@@ -1,0 +1,8 @@
+#autoload -U
+#vim: set ft=zsh 
+#
+# This function takes a format, and generates an output file name
+# based on the already read data (see read-cli-files).
+
+echo $1
+return 0
