@@ -1,0 +1,34 @@
+-------------------------------------------------------------------------
+                                 INVOICE
+-------------------------------------------------------------------------
+
+From:
+<cli>
+        conf_ifdef_printf issuer.company "\t%s\n"
+        conf_ifdef_printf issuer.address "\t%s\n"
+        conf_ifdef_printf issuer.phone   "\t%s\n"
+</cli>
+
+To:
+<cli>
+        conf_ifdef_printf client.company "\t%s\n"
+        conf_ifdef_printf client.care-of "\tc/o %s\n"
+        conf_ifdef_printf client.address "\t%s\n"
+        conf_ifdef_printf client.phone   "\t%s\n"
+</cli>
+
+-------------------------------------------------------------------------
+
+Prices calculated according to contract signed by the above parties:
+
+No.  |  Date      |  Description                   | Hours   | Cost
+-----+------------+--------------------------------+---------+-----------
+<cli for_each_day>
+        vars_printf " %-3s | %-10s | %-30s | %7.0f | %8.2f\n" sequence date text/30 dayhours daycost
+        vars_printf "-----+------------+--------------------------------+---------+-----------\n"
+</cli>                                            Totals | <cli>
+        vars_printf "%7.0f" totalhours
+                                                     </cli> | <cli>
+        vars_printf "%8.2f" totalcost
+</cli>
+                                                   +---------+-----------
