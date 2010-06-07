@@ -1,0 +1,42 @@
+% this file is a sample template to be used for formatting your invoices
+
+\documentclass{article}
+
+\begin{document}
+
+\begin{center}
+\huge{\textbf{INVOICE}}
+\end{center}
+
+
+
+\subsection*{From}
+Mister Contractor \\
+Apt 1, 2 Main St \\
+City, Province \\
+A1B 2C3 \\
+
+\subsection*{To}
+Mister Client \\
+Suite 1, 2 Main St \\
+City, Province \\
+A1B 2C3 \\
+
+\subsection*{Billing}
+\begin{tabular}{ | r l p{180pt} r r | }
+	\hline
+	\textbf{No.} &  \textbf{Date} & \textbf{Description} & \textbf{Hours} & \textbf{Cost} \\
+	\hline
+	1 & 2010-05-01 & Finding your dog & 7 & 14 \\
+	2 & 2010-05-03 & traded dog in for cat & 2 & 4 \\
+	3 & 2010-05-15 & traded cat in for a fish and then seeing how latex reacts to having a much longer line here & 4 & 8 \\
+	\hline
+	\multicolumn{4}{| r}{ \textbf{Subtotal} } & 26.00 \\
+	\multicolumn{4}{| r}{ HST 13\% } & 3.38 \\
+	\hline
+	\multicolumn{4}{| r}{ \textbf{Total} } & 29.38 \\
+	\hline
+\end{tabular}
+
+\end{document}
+
