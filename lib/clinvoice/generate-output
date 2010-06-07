@@ -4,4 +4,151 @@
 # This function takes as arguments a template file name and an output
 # file name.  It processes the template to generate the result.
 
-cat "$1" > "$2"
+local input=$1
+local output=$2
+
+RE_MATCH_PCRE=1
+zmodload zsh/pcre
+
+local mode=normal
+local -a script
+local after=
+local -A vars
+
+function process_line() {
+        local line="$1"
+        process_$mode "$line"
+}
+
+function process_normal() {
+        local line="$1"
+
+        if [[ $line =~ "<cli(.*)>" ]] ; then
+                local arg="${match[1]}"
+                local pre="${line%<cli$arg>*}"
+                local post="${line#*<cli$arg>}"
+                after=${arg# }
+
+                printf >$output "%s" "$pre"
+
+                if [[ -z "$after" ]] ; then
+                        mode=script
+                        process_script "$post"
+                else
+                        script=()
+                        mode=accumulate
+                        process_accumulate "$post"
+                fi
+        else
+                printf >$output "%s\n" "$line"
+        fi
+}
+
+function process_accumulate() {
+        local line="$1"
+
+        if [[ $line =~ "</cli>" ]] ; then
+                local pre="${line%</cli>*}"
+                local post="${line#*</cli>}"
+
+                script+=( "$pre" )
+
+                run_accumulated
+
+                mode=normal
+                process_normal "$post"
+        else
+                script+=( "$line" )
+        fi
+}
+
+function process_script() {
+        local line="$1"
+
+        if [[ $line =~ "</cli>" ]] ; then
+                local pre=${line%</cli>*}
+                local post=${line#*</cli>}
+
+                run_script $pre
+
+                mode=normal
+                process_normal "$post"
+        else
+                run_script $line
+        fi
+}
+
+function run_accumulated() {
+        case $after in
+            for_each_day)
+                local -F rate=${conf[contract.hourly-rate]}
+                vars[sequence]=0
+                vars[totalhours]=
+                vars[totalcost]=
+                for day in ${(k)dayhours} ; do
+                        # setup the loop variables
+                        let "vars[sequence] = ${vars[sequence]} + 1"
+                        vars[date]=$day
+                        vars[text]=${${daytext[$day]}//; }
+                        local -F hours=${dayhours[$day]}
+                        vars[dayhours]=$hours
+                        let "cost = $hours * $rate"
+                        vars[daycost]=$cost
+
+                        local -F tmp=${vars[totalhours]:-0}
+                        let "tmp = $tmp + $hours"
+                        vars[totalhours]=$tmp
+
+                        local -F tmp=${vars[totalcost]:-0}
+                        let "tmp = $tmp + $cost"
+                        vars[totalcost]=$tmp
+
+                        # now run the accumulated script
+                        for line in $script ; do
+                                run_script $line
+                        done
+                done
+                ;;
+            *)
+                die "unknon <cli $after> expression"
+                ;;
+        esac
+}
+
+function run_script() {
+        local line=$1
+        local -a argv
+        argv=( ${(Q)${(z)line}} )
+        [[ $#argv = 0 ]] && return
+
+        case ${argv[1]} in 
+            vars_printf)
+                # vars_printf <format> <vars>...
+                # ... for each var, look it up, and print everything
+                for (( n=3; n<=$#argv; n++ )) ; do
+                        local var=${argv[$n]}
+                        local max=${var#*/}
+                        var=${var%/*}
+                        local val=${vars[$var]}
+                        [[ -n "$val" ]] || die "undefined template variable '$var'"
+                        [[ "$max" != "$var" ]] && val="${val[1,$max]}"
+                        argv[$n]=$val
+                done
+                printf ${argv[2,-1]}
+                ;;
+            conf_ifdef_printf)
+                # conf_ifdef_printf <config-name> <format>
+                # ... check if <config-name> exists, and print if it does
+                local var=${argv[2]}
+                [[ -n "${conf[$var]}" ]] && printf ${argv[3]} ${conf[$var]}
+                ;;
+            *)
+                die "unknown template function '${argv[1]}'"
+                ;;
+        esac
+}
+
+while IFS= read -r line ; do
+        process_line "$line"
+done < $input
+

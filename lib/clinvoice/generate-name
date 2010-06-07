@@ -4,5 +4,5 @@
 # This function takes a format, and generates an output file name
 # based on the already read data (see read-cli-files).
 
-echo $1
+echo "/dev/stdout"
 return 0
