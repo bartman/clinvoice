@@ -59,5 +59,10 @@ read-cli-files $CLI_DIR/*.cli
 # generate output file name based on intput data
 local output_file=$(generate-name "${conf[generator.$arg_type.output]}")
 
+# reset file before starting
+: </dev/null >"$output_file"
+
 # dump the data
 generate-output "$template_file" "$output_file"
+
+echo >&2 "generated $output_file"

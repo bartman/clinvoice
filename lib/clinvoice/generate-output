@@ -29,7 +29,7 @@ function process_normal() {
                 local post="${line#*<cli$arg>}"
                 after=${arg# }
 
-                printf >$output "%s" "$pre"
+                printf >>$output "%s" "$pre"
 
                 if [[ -z "$after" ]] ; then
                         mode=script
@@ -40,7 +40,7 @@ function process_normal() {
                         process_accumulate "$post"
                 fi
         else
-                printf >$output "%s\n" "$line"
+                printf >>$output "%s\n" "$line"
         fi
 }
 
@@ -134,13 +134,13 @@ function run_script() {
                         [[ "$max" != "$var" ]] && val="${val[1,$max]}"
                         argv[$n]=$val
                 done
-                printf >$output ${argv[2,-1]}
+                printf >>$output ${argv[2,-1]}
                 ;;
             conf_ifdef_printf)
                 # conf_ifdef_printf <config-name> <format>
                 # ... check if <config-name> exists, and print if it does
                 local var=${argv[2]}
-                [[ -n "${conf[$var]}" ]] && printf >$output ${argv[3]} ${conf[$var]}
+                [[ -n "${conf[$var]}" ]] && printf >>$output ${argv[3]} ${conf[$var]}
                 ;;
             *)
                 die "unknown template function '${argv[1]}'"

@@ -4,5 +4,13 @@
 # This function takes a format, and generates an output file name
 # based on the already read data (see read-cli-files).
 
-echo "/dev/stdout"
-return 0
+zmodload zsh/datetime
+
+local fmt=$1
+
+# get the last date
+local last=${${(k)dayhours}[-1]}
+local date=$(strftime -r "%Y.%m.%d" $last)
+
+local name=${fmt//\%#/1}        # HACK! always sequence 1
+strftime $name $date
