@@ -19,6 +19,9 @@ function read_conf_file() {
                 if [[ "$line" =~ "\[([a-z0-9]+)\]" ]] ; then
                         section=${match[1]}
 
+                elif [[ "$line" =~ "\[([a-z0-9]+)\s+\"([a-z0-9]+)\"\]" ]] ; then
+                        section="${match[1]}.${match[2]}"
+
                 elif [[ "$line" =~ "^\s*([a-z0-9]+)\s*=\s*(.*)$" ]] ; then
                         local var="$section.${match[1]}"
                         local val="${match[2]}"

@@ -15,7 +15,7 @@
     hourly-rate = 50
     tax         = HST 13%
 
-[latex]
+[generator "latex"]
     # template file to read in to generate output
     template    = bnl-template.tex
     # output to generate, witht he following substitutions:
@@ -26,11 +26,11 @@
     #   %d - last day in invoice
     output      = bnl-%Y%m%d-%#.tex
 
-[txt]
+[generator "txt"]
     template    = bnl-template.txt
     output      = bnl-%Y%m%d-%#.txt
 
-[pdf]
+[generator "pdf"]
     template    = bnl-template.tex
     output      = bnl-%Y%m%d-%#.tex
     # rendering is done by calling this program, substituting %s for 'output' above

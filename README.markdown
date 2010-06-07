@@ -48,7 +48,7 @@ Here is what you'd find in a project config file:
         hourly-rate = 50
         tax         = HST 13%
 
-    [latex]
+    [generator "latex"]
         # template file to read in to generate output
         template    = bnl-template.tex
         # output to generate, witht he following substitutions:
@@ -59,11 +59,11 @@ Here is what you'd find in a project config file:
         #   %d - last day in invoice
         output      = bnl-%Y%m%d-%#.tex
 
-    [txt]
+    [generator "txt"]
         template    = bnl-template.txt
         output      = bnl-%Y%m%d-%#.txt
 
-    [pdf]
+    [generator "pdf"]
         template    = bnl-template.tex
         output      = bnl-%Y%m%d-%#.tex
 
