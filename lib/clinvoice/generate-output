@@ -81,27 +81,18 @@ function process_script() {
 function run_accumulated() {
         case $after in
             for_each_day)
-                local -F rate=${conf[contract.hourly-rate]}
-                vars[sequence]=0
-                vars[totalhours]=
-                vars[totalcost]=
+                local -F rate=${vars[hourlyrate]}
+                vars[number]=0
                 for day in ${(k)dayhours} ; do
                         # setup the loop variables
-                        let "vars[sequence] = ${vars[sequence]} + 1"
+                        let "vars[number] = ${vars[number]} + 1"
                         vars[date]=$day
                         vars[text]=${${daytext[$day]}//; }
+
                         local -F hours=${dayhours[$day]}
                         vars[dayhours]=$hours
                         let "cost = $hours * $rate"
                         vars[daycost]=$cost
-
-                        local -F tmp=${vars[totalhours]:-0}
-                        let "tmp = $tmp + $hours"
-                        vars[totalhours]=$tmp
-
-                        local -F tmp=${vars[totalcost]:-0}
-                        let "tmp = $tmp + $cost"
-                        vars[totalcost]=$tmp
 
                         # now run the accumulated script
                         for line in $script ; do
@@ -160,6 +151,35 @@ function run_script() {
 vars[lastdate]=$(strftime -r "%Y.%m.%d" ${${(k)dayhours}[-1]})
 vars[sequence]=1                        # HACK! always sequence 1 for now
 vars[today]=$(date +%s)
+vars[totalhours]=0
+vars[subtotalcost]=0
+vars[hourlyrate]=${conf[contract.hourly-rate]}
+
+local tax=${conf[contract.tax]}
+[[ $tax =~ "^([^ ]+)\s+([0-9.]+)%\s*$" ]] || die "invalid contract.tax format '$tax' (ex: VAT 5%)"
+vars[taxname]=${match[1]}
+vars[taxpercent]=${match[2]}
+
+for day in ${(k)dayhours} ; do
+        local -F hours=${dayhours[$day]}
+        vars[daycost]=$cost
+
+        local -F tmp=${vars[totalhours]}
+        let "tmp = $tmp + $hours"
+        vars[totalhours]=$tmp
+
+done
+
+local -F hours=${vars[totalhours]}
+local -F rate=${vars[hourlyrate]}
+let "cost = $hours * $rate"
+vars[subtotalcost]=$cost
+
+let "taxcost = ( ${vars[taxpercent]} * $cost ) / 100"
+vars[taxcost]=$taxcost
+
+let "cost = $cost + $taxcost"
+vars[totalcost]=$cost
 
 # process...
 while IFS= read -r line ; do
