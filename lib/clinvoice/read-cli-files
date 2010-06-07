@@ -51,7 +51,7 @@ function calc_duration() {
 
                 let "duration = $hrs + ( $min / 60 )"
 
-                printf "%0.0f" $duration
+                echo $duration
                 return 0
         fi
 
@@ -64,19 +64,19 @@ function update_entries() {
 
         daytext[$day]="${daytext[$day]}$text"
 
-        local tmp=${dayhours[$day]:-0}
+        local -F tmp=${dayhours[$day]:-0}
         let "tmp = $tmp + $dur"
         dayhours[$day]=$tmp
 
         local month=${day%.*}
 
-        local tmp=${monthhours[$month]:-0}
+        local -F tmp=${monthhours[$month]:-0}
         let "tmp = $tmp + $dur"
         monthhours[$month]=$tmp
 
         local year=${day%.*}
 
-        local tmp=${yearhours[$year]:-0}
+        local -F tmp=${yearhours[$year]:-0}
         let "tmp = $tmp + $dur"
         yearhours[$year]=$tmp
 }
