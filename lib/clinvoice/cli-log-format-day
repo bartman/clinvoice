@@ -5,7 +5,7 @@
 
 local total=0
 
-for day in ${(k)dayhours} ; do
+for day in ${(o)${(k)dayhours}} ; do
         local time=${dayhours[$day]}
 
         printf "$day  %4.0f\n" $time

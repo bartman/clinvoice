@@ -3,7 +3,7 @@
 #
 # this function outputs the daily itemized output
 
-for day in ${(k)daytext} ; do
+for day in ${(o)${(k)daytext}} ; do
         local time=${dayhours[$day]}
 
         printf "$day  (%0.0fh)\n" $time

@@ -15,7 +15,7 @@ function print_month() {
         let "ttl_cnt=$ttl_cnt+1"
 }
 
-for day in ${(k)dayhours} ; do
+for day in ${(o)${(k)dayhours}} ; do
         local time=${dayhours[$day]}
         local month=${day%.*}
 
