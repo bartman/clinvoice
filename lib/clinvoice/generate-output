@@ -23,7 +23,7 @@ function process_line() {
 function process_normal() {
         local line="$1"
 
-        if [[ $line =~ "<cli(.*)>" ]] ; then
+        if [[ $line =~ "<cli([^>]*)>" ]] ; then
                 local arg="${match[1]}"
                 local pre="${line%<cli$arg>*}"
                 local post="${line#*<cli$arg>}"
@@ -136,6 +136,14 @@ function run_script() {
                 done
                 printf >>$output ${argv[2,-1]}
                 ;;
+            vars_print_date)
+                # vars_print_date <format> <var>
+                # ... uses date formatting to print a date given a variable name
+                local var=${argv[3]}
+                local val=${vars[$var]}
+                [[ -n "$val" ]] || die "undefined template variable '$var'"
+                strftime >>$output ${argv[2]} $val
+                ;;
             conf_ifdef_printf)
                 # conf_ifdef_printf <config-name> <format>
                 # ... check if <config-name> exists, and print if it does
@@ -148,6 +156,12 @@ function run_script() {
         esac
 }
 
+# initialize some variables
+vars[lastdate]=$(strftime -r "%Y.%m.%d" ${${(k)dayhours}[-1]})
+vars[sequence]=1                        # HACK! always sequence 1 for now
+vars[today]=$(date +%s)
+
+# process...
 while IFS= read -r line ; do
         process_line "$line"
 done < $input

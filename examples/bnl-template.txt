@@ -17,6 +17,10 @@ To:
         conf_ifdef_printf client.phone   "\t%s\n"
 </cli>
 
+Invoice ending date: <cli> vars_print_date "%B %e, %Y" lastdate </cli>
+Invoice number:      <cli> vars_printf "%d" sequence </cli>
+Invoice date:        <cli> vars_print_date "%B %e, %Y" today </cli>
+
 -------------------------------------------------------------------------
 
 Prices calculated according to contract signed by the above parties:
