@@ -82,7 +82,7 @@ function run_accumulated() {
             for_each_day)
                 local -F rate=${vars[hourlyrate]}
                 vars[number]=0
-                for day in ${(k)dayhours} ; do
+                for day in ${(ko)dayhours} ; do
                         # setup the loop variables
                         let "vars[number] = ${vars[number]} + 1"
                         vars[date]=$day
