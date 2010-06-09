@@ -66,3 +66,10 @@ local output_file=$(generate-name "${conf[generator.$arg_type.output]}")
 generate-output "$template_file" "$output_file"
 
 echo >&2 "generated $output_file"
+
+local build=${conf[generator.$arg_type.build]}
+if [[ -n "$build" ]] ; then
+        local cmd=${build/%%s/$output_file}
+        echo >&2 "running: $cmd"
+        eval "$cmd"
+fi

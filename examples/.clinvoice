@@ -34,5 +34,5 @@
     template    = bnl-template.tex
     output      = bnl-%Y%m%d-%#.tex
     # rendering is done by calling this program, substituting %s for 'output' above
-    build       = latex %s
+    build       = pdflatex %s
 
