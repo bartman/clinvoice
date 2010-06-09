@@ -1,52 +1,79 @@
 % this file is a sample template to be used for formatting your invoices
 
-\documentclass[letter]{article}
-\oddsidemargin -0.04cm
-\evensidemargin -0.04cm
+\documentclass[letterpaper]{article}
+\addtolength{\oddsidemargin}{-2.5cm}
+\addtolength{\evensidemargin}{-2.5cm}
+\addtolength{\textwidth}{5.0cm}
 
 \begin{document}
+\thispagestyle{empty}
 
 \begin{center}
 \huge{\textbf{INVOICE}}
 \end{center}
 
 \subsection*{From}
-<cli> conf_ifdef_printf issuer.company '%s' </cli> \\
-<cli> conf_ifdef_printf issuer.address '%s' </cli> \\
-<cli> conf_ifdef_printf issuer.phone   '%s' </cli> \\
-
-\subsection*{To}
-<cli> conf_ifdef_printf client.company '%s'     </cli> \\
-<cli> conf_ifdef_printf client.care-of 'c/o %s' </cli> \\
-<cli> conf_ifdef_printf client.address '%s'     </cli> \\
-<cli> conf_ifdef_printf client.phone   '%s'     </cli> \\
-
-\begin{tabular}{ l l l }
-        \textbf{Invoice ending date} & \textbf{Invoice number} & \textbf{Invoice date} \\
-        <cli> vars_print_date '%B %e, %Y' lastdate </cli> &
-        <cli> vars_printf     '%d'        sequence </cli> &
-        <cli> vars_print_date '%B %e, %Y' today    </cli> \\
+\begin{tabular}{l}
+<cli>
+    conf_ifdef_printf issuer.company '%s \\\\\n'
+    conf_ifdef_printf issuer.address '%s \\\\\n'
+    conf_ifdef_printf issuer.phone   '%s \\\\\n'
+</cli>
 \end{tabular}
 
-\subsection*{Billing}
-\begin{tabular}{ | r l p{250pt} r r | }
+\subsection*{To}
+\begin{tabular}{l}
+<cli>
+    conf_ifdef_printf client.company '%s \\\\\n'
+    conf_ifdef_printf client.care-of 'c/o %s \\\\\n'
+    conf_ifdef_printf client.address '%s \\\\\n'
+    conf_ifdef_printf client.phone   '%s \\\\\n'
+</cli>
+\end{tabular}
+
+\subsection*{Details}
+
+\begin{center}
+\begin{tabular}{l l l}
+        \textbf{Invoice ending date} & \textbf{Invoice number} & \textbf{Invoice date} \\
+        <cli> vars_print_date '%B %e, %Y' lastdate </cli> & \
+        <cli> vars_printf     '%d'        sequence </cli> & \
+        <cli> vars_print_date '%B %e, %Y' today    </cli> \\
+\end{tabular}
+\end{center}
+
+\vspace{0.5cm}
+
+Prices calculated according to contract signed by the above parties:
+
+\vspace{0.1cm}
+
+\begin{center}
+\begin{tabular}{ r l p{0.5\textwidth} r r }
 	\hline
 	\textbf{No.} &  \textbf{Date} & \textbf{Description} & \textbf{Hours} & \textbf{Cost} \\
 	\hline
 <cli for_each_day>
 vars_printf '        %s & %s & %s & %0.0f & %0.2f \\\\\n' number date text dayhours daycost
 </cli>	\hline
-	\multicolumn{4}{| r}{ \textbf{Subtotal} } & <cli>
+	\multicolumn{4}{r}{ \textbf{Subtotal} } & <cli>
             vars_printf '%0.2f' subtotalcost </cli> \\
-	\multicolumn{4}{| r}{ <cli>
+        \multicolumn{3}{c}{ <cli> 
+            vars_printf '%s' taxid
+            </cli> } & <cli>
             vars_printf '%s %s' taxname taxpercent
-            </cli>\% } & <cli>
+            </cli>\% & <cli>
             vars_printf '%0.2f' taxcost </cli> \\
 	\hline
-	\multicolumn{4}{| r}{ \textbf{Total} } & <cli>
+	\multicolumn{4}{r}{ \textbf{Total} } & <cli>
             vars_printf '%0.2f' totalcost </cli> \\
-	\hline
 \end{tabular}
+\end{center}
+
+\subsection*{Notes}
+\begin{itemize}
+        \item Please make cheque payable to <cli> conf_ifdef_printf issuer.company '%s' </cli>
+\end{itemize}
 
 \end{document}
 

@@ -13,7 +13,8 @@
 
 [contract]
     hourly-rate = 50
-    tax         = HST 13%
+    tax         = VAT 10%
+    taxid       = my tax number 12345
 
 [generator "latex"]
     # template file to read in to generate output
