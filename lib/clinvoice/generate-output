@@ -164,6 +164,7 @@ local tax=${conf[contract.tax]}
 [[ $tax =~ "^([^ ]+)\s+([0-9.]+)%\s*$" ]] || die "invalid contract.tax format '$tax' (ex: VAT 5%)"
 vars[taxname]=${match[1]}
 vars[taxpercent]=${match[2]}
+vars[taxid]=${conf[contract.taxid]}
 
 for day in ${(k)dayhours} ; do
         local -F hours=${dayhours[$day]}
