@@ -6,6 +6,7 @@
 
 local input=$1
 local output=$2
+local escape_type=$3
 
 RE_MATCH_PCRE=1
 zmodload zsh/pcre
@@ -122,7 +123,7 @@ function run_script() {
                         local val=${vars[$var]}
                         [[ -n "$val" ]] || die "undefined template variable '$var'"
                         [[ "$max" != "$var" ]] && val="${val[1,$max]}"
-                        argv[$n]=$val
+                        argv[$n]="$($escape_word $val)"
                 done
                 printf >>$output ${argv[2,-1]}
                 ;;
@@ -133,13 +134,17 @@ function run_script() {
                 local var=${argv[3]}
                 local val=${vars[$var]}
                 [[ -n "$val" ]] || die "undefined template variable '$var'"
-                printf >>$output "%s" "$(strftime $fmt $val)"
+                local tmp="$(strftime $fmt $val)"
+                local tmp="$($escape_word $tmp)"
+                printf >>$output "%s" "$tmp"
                 ;;
             conf_ifdef_printf)
                 # conf_ifdef_printf <config-name> <format>
                 # ... check if <config-name> exists, and print if it does
                 local var=${argv[2]}
-                [[ -n "${conf[$var]}" ]] && printf >>$output ${argv[3]} ${conf[$var]}
+                local val=${conf[$var]}
+                local val="$($escape_word $val)"
+                [[ -n "${conf[$var]}" ]] && printf >>$output ${argv[3]} $val
                 ;;
             *)
                 die "unknown template function '${argv[1]}'"
@@ -181,6 +186,38 @@ vars[taxcost]=$taxcost
 
 let "cost = $cost + $taxcost"
 vars[totalcost]=$cost
+
+# setup escaping
+local escape_word=escape_noop
+if [[ -n "$escape" ]] ; then
+        case $escape in
+            latex)
+                escape_word=escape_$escape
+                ;;
+            *)
+                die "don't know how to escape '$escape'"
+                ;;
+        esac
+fi
+
+function escape_noop() {
+        printf "%s" "$1"
+}
+
+function escape_latex() {
+        local txt="$1"
+
+        txt=${txt//\\/\\\\}
+        txt=${txt//\#/\\\#}
+        txt=${txt//_/\\_}
+        txt=${txt//&/\\&}
+        txt=${txt//\%/\\%}
+        txt=${txt//^/\\^\{\}}
+        txt=${txt//\~/\\~\{\}}
+
+        printf "%s" "$txt"
+}
+
 
 # process...
 while IFS= read -r line ; do

@@ -72,11 +72,14 @@ typeset -g gen_seq=${arg_seq:-1}
 # generate output file name based on intput data
 local output_file=$(generate-name "${conf[generator.$arg_type.output]}")
 
+# this is the escaping type
+local escape="${conf[generator.$arg_type.escape]}"
+
 # reset file before starting
 : </dev/null >"$output_file"
 
 # dump the data
-generate-output "$template_file" "$output_file"
+generate-output "$template_file" "$output_file" "$escape"
 
 echo >&2 "generated $output_file"
 

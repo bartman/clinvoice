@@ -18,6 +18,8 @@
 [generator "latex"]
     # template file to read in to generate output
     template    = bnl-template.tex
+    # some output formats require special escaping
+    escape      = latex
     # output to generate, witht he following substitutions:
     #   %% - a literal %
     #   %# - sequence number
@@ -32,6 +34,7 @@
 
 [generator "pdf"]
     template    = bnl-template.tex
+    escape      = latex
     output      = bnl-%Y%m%d-%#.tex
     # rendering is done by calling this program, substituting %s for 'output' above
     build       = pdflatex %s
