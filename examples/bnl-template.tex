@@ -19,10 +19,11 @@
 <cli> conf_ifdef_printf client.address '%s'     </cli> \\
 <cli> conf_ifdef_printf client.phone   '%s'     </cli> \\
 
-\begin{tabular}{ l l }
-        Invoice ending date: & <cli> vars_print_date '%B %e, %Y' lastdate </cli> \\
-        Invoice number:      & <cli> vars_printf     '%d'        sequence </cli> \\
-        Invoice date:        & <cli> vars_print_date '%B %e, %Y' today    </cli> \\
+\begin{tabular}{ l l l }
+        \textbf{Invoice ending date} & \textbf{Invoice number} & \textbf{Invoice date} \\
+        <cli> vars_print_date '%B %e, %Y' lastdate </cli> &
+        <cli> vars_printf     '%d'        sequence </cli> &
+        <cli> vars_print_date '%B %e, %Y' today    </cli> \\
 \end{tabular}
 
 \subsection*{Billing}
