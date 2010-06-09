@@ -1,6 +1,9 @@
 #autoload -U
 #vim: set ft=zsh 
 
+local arg_type=
+local arg_seq=
+
 # parse local options
 while [[ -n "$1" && "${1[1]}" = "-" ]] ; do
         opt=$1 ; shift
@@ -14,6 +17,13 @@ while [[ -n "$1" && "${1[1]}" = "-" ]] ; do
                 ;;
             --type=*)
                 arg_type=${opt#--type=}
+                ;;
+            -s)
+                arg_seq=$1
+                shift 2>/dev/null || die "generate -s requires an argument"
+                ;;
+            --sequence=*)
+                arg_seq=${opt#--sequence=}
                 ;;
             *)
             die "unknown config option '$opt'"
@@ -55,6 +65,9 @@ done
 read-cli-files $CLI_DIR/*.cli
 
 [[ ${#dayhours} = 0 ]] && die "no entries found"
+
+# TODO: should be able to figure out the sequence given the existing files
+typeset -g gen_seq=${arg_seq:-1}
 
 # generate output file name based on intput data
 local output_file=$(generate-name "${conf[generator.$arg_type.output]}")

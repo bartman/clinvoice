@@ -149,7 +149,7 @@ function run_script() {
 
 # initialize some variables
 vars[lastdate]=$(strftime -r "%Y.%m.%d" ${${(k)dayhours}[-1]})
-vars[sequence]=1                        # HACK! always sequence 1 for now
+vars[sequence]=${gen_seq:-1}
 vars[today]=$(date +%s)
 vars[totalhours]=0
 vars[subtotalcost]=0

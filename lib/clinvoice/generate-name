@@ -12,5 +12,7 @@ local fmt=$1
 local last=${${(k)dayhours}[-1]}
 local date=$(strftime -r "%Y.%m.%d" $last)
 
-local name=${fmt//\%#/1}        # HACK! always sequence 1
+local seq=${gen_seq:-1}
+
+local name=${fmt//\%#/$seq}
 strftime $name $date
