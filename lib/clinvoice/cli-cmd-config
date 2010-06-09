@@ -8,7 +8,7 @@
 while [[ -n "$1" && "${1[1]}" = "-" ]] ; do
         opt=$1 ; shift
         case "$opt" in
-            -h|--list)
+            -h|--help)
                 cli-config-help 0
                 ;;
             -l|--list)
