@@ -16,8 +16,7 @@ local after=
 local -A vars
 
 function process_line() {
-        local line="$1"
-        process_$mode "$line"
+        process_$mode $1
 }
 
 function process_normal() {
@@ -87,7 +86,7 @@ function run_accumulated() {
                         # setup the loop variables
                         let "vars[number] = ${vars[number]} + 1"
                         vars[date]=$day
-                        vars[text]=${${daytext[$day]}//; }
+                        vars[text]=${${daytext[$day]}///; }
 
                         local -F hours=${dayhours[$day]}
                         vars[dayhours]=$hours
@@ -175,7 +174,8 @@ local -F rate=${vars[hourlyrate]}
 let "cost = $hours * $rate"
 vars[subtotalcost]=$cost
 
-let "taxcost = ( ${vars[taxpercent]} * $cost ) / 100"
+local -F taxcost=${vars[taxpercent]}
+let "taxcost = ( $taxcost * $cost ) / 100"
 vars[taxcost]=$taxcost
 
 let "cost = $cost + $taxcost"
@@ -183,6 +183,6 @@ vars[totalcost]=$cost
 
 # process...
 while IFS= read -r line ; do
-        process_line "$line"
+        process_line $line
 done < $input
 
