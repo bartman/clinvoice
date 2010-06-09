@@ -1,0 +1,49 @@
+% this file is a sample template to be used for formatting your invoices
+
+\documentclass{article}
+
+\begin{document}
+
+\begin{center}
+\huge{\textbf{INVOICE}}
+\end{center}
+
+\subsection*{From}
+<cli> conf_ifdef_printf issuer.company '%s' </cli> \\
+<cli> conf_ifdef_printf issuer.address '%s' </cli> \\
+<cli> conf_ifdef_printf issuer.phone   '%s' </cli> \\
+
+\subsection*{To}
+<cli> conf_ifdef_printf client.company '%s'     </cli> \\
+<cli> conf_ifdef_printf client.care-of 'c/o %s' </cli> \\
+<cli> conf_ifdef_printf client.address '%s'     </cli> \\
+<cli> conf_ifdef_printf client.phone   '%s'     </cli> \\
+
+\begin{tabular}{ l l }
+        Invoice ending date: & <cli> vars_print_date '%B %e, %Y' lastdate </cli> \\
+        Invoice number:      & <cli> vars_printf     '%d'        sequence </cli> \\
+        Invoice date:        & <cli> vars_print_date '%B %e, %Y' today    </cli> \\
+\end{tabular}
+
+\subsection*{Billing}
+\begin{tabular}{ | r l p{180pt} r r | }
+	\hline
+	\textbf{No.} &  \textbf{Date} & \textbf{Description} & \textbf{Hours} & \textbf{Cost} \\
+	\hline
+<cli for_each_day>
+vars_printf '        %s & %s & %s & %0.0f & %0.2f \\\\\n' number date text dayhours daycost
+</cli>	\hline
+	\multicolumn{4}{| r}{ \textbf{Subtotal} } & <cli>
+            vars_printf '%0.2f' subtotalcost </cli> \\
+	\multicolumn{4}{| r}{ <cli>
+            vars_printf '%s %s' taxname taxpercent
+            </cli>\% } & <cli>
+            vars_printf '%0.2f' taxcost </cli> \\
+	\hline
+	\multicolumn{4}{| r}{ \textbf{Total} } & <cli>
+            vars_printf '%0.2f' totalcost </cli> \\
+	\hline
+\end{tabular}
+
+\end{document}
+
