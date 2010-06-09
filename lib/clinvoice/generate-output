@@ -83,7 +83,7 @@ function run_accumulated() {
             for_each_day)
                 local -F rate=${vars[hourlyrate]}
                 vars[number]=0
-                for day in ${(ko)dayhours} ; do
+                for day in ${(o)${(k)dayhours}} ; do
                         # setup the loop variables
                         let "vars[number] = ${vars[number]} + 1"
                         vars[date]=$day
@@ -153,7 +153,7 @@ function run_script() {
 }
 
 # initialize some variables
-vars[lastdate]=$(strftime -r "%Y.%m.%d" ${${(k)dayhours}[-1]})
+vars[lastdate]=$(strftime -r "%Y.%m.%d" ${${(o)${(k)dayhours}}[-1]})
 vars[sequence]=${gen_seq:-1}
 vars[today]=$(date +%s)
 vars[totalhours]=0

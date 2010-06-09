@@ -9,7 +9,7 @@ zmodload zsh/datetime
 local fmt=$1
 
 # get the last date
-local last=${${(k)dayhours}[-1]}
+local last=${${(o)${(k)dayhours}}[-1]}
 local date=$(strftime -r "%Y.%m.%d" $last)
 
 local seq=${gen_seq:-1}
