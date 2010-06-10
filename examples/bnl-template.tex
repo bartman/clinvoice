@@ -37,14 +37,15 @@
 \begin{tabular}{l l l}
         \textbf{Invoice ending date} & \textbf{Invoice number} & \textbf{Invoice date} \\
         <cli> vars_print_date '%B %e, %Y' lastdate </cli> & \
-        <cli> vars_printf     '%d'        sequence </cli> & \
+        <cli> conf_ifdef_printf client.short-name '%s-'
+              vars_printf     '%d'        sequence </cli> & \
         <cli> vars_print_date '%B %e, %Y' today    </cli> \\
 \end{tabular}
 \end{center}
 
 \vspace{0.5cm}
 
-Prices calculated according to contract signed by the above parties:
+Prices calculated according to contract signed by the above parties.
 
 \vspace{0.1cm}
 
@@ -54,7 +55,7 @@ Prices calculated according to contract signed by the above parties:
 	\textbf{No.} &  \textbf{Date} & \textbf{Description} & \textbf{Hours} & \textbf{Cost} \\
 	\hline
 <cli for_each_day>
-vars_printf '        %s & %s & %s & %0.0f & %0.2f \\\\\n' number date text dayhours daycost
+vars_printf '        %s & %s & %s & %0.1f & %0.2f \\\\\n' number date text dayhours daycost
 </cli>	\hline
 	\multicolumn{4}{r}{ \textbf{Subtotal} } & <cli>
             vars_printf '%0.2f' subtotalcost </cli> \\

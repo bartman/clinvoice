@@ -6,6 +6,7 @@
 
 # and the rest would live in this file (in the project dir)
 [client]
+    short-name  = BNL
     care-of     = Shelby Forthright
     company     = Buy N Large
     address     = 1 Buy n Large Plaza, BnL Ave. | Largefield, NJ, 08012 | USA
