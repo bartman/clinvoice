@@ -3,6 +3,7 @@
 
 local arg_type=
 local arg_seq=
+local output_file=
 
 # parse local options
 while [[ -n "$1" && "${1[1]}" = "-" ]] ; do
@@ -10,6 +11,13 @@ while [[ -n "$1" && "${1[1]}" = "-" ]] ; do
         case "$opt" in
             -h|--help)
                 cli-generate-help 0
+                ;;
+            -o)
+                output_file="$1"
+                shift 2>/dev/null || die "generate -o requires an argument"
+                ;;
+            --output=*)
+                output_file=${opt#--output=}
                 ;;
             -t)
                 arg_type=$1
@@ -70,7 +78,7 @@ read-cli-files $CLI_DIR/*.cli
 typeset -g gen_seq=${arg_seq:-1}
 
 # generate output file name based on intput data
-local output_file=$(generate-name "${conf[generator.$arg_type.output]}")
+[[ -z "$output_file" ]] && output_file=$(generate-name "${conf[generator.$arg_type.output]}")
 
 # this is the escaping type
 local escape="${conf[generator.$arg_type.escape]}"

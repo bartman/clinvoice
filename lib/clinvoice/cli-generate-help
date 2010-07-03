@@ -17,6 +17,7 @@ cli generate [options...] [ <date spec> ]
 
 Options:
 
+ -o --output=<file>   - output file (overrides config)
  -t --type=<format>   - type of generator to use
  -s --sequence=<num>  - force sequence to this number
 
