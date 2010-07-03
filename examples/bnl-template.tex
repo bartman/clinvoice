@@ -58,7 +58,7 @@ Prices calculated according to contract signed by the above parties.
 	\textbf{No.} &  \textbf{Date} & \textbf{Description} & \textbf{Hours} & \textbf{Cost} \\
 	\hline
 <cli for_each_day>
-vars_printf '        %s & %s & %s & %0.1f & %0.2f \\\\\n' number date text dayhours daycost
+vars_printf '        %s & %s & %s & %g & %0.2f \\\\\n' number date text dayhours daycost
 </cli>	\hline
 	\multicolumn{4}{r}{ \textbf{Subtotal} } & <cli>
             vars_printf '%0.2f' subtotalcost </cli> \\

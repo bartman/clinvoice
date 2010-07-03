@@ -28,7 +28,7 @@ Prices calculated according to contract signed by the above parties:
 No.  |  Date      |  Description                   | Hours   | Cost
 -----+------------+--------------------------------+---------+-----------
 <cli for_each_day>
-        vars_printf ' %-3s | %-10s | %-30s | %7.0f | %8.2f\n' number date text/30 dayhours daycost
+        vars_printf ' %-3s | %-10s | %-30s | %7g | %8.2f\n' number date text/30 dayhours daycost
         vars_printf '-----+------------+--------------------------------+---------+-----------\n'
 </cli>                                          Subtotal | <cli>
         vars_printf '%7.0f' totalhours
