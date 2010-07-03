@@ -6,7 +6,7 @@
 for day in ${(o)${(k)daytext}} ; do
         local time=${dayhours[$day]}
 
-        printf "$day  (%0.0fh)\n" $time
+        printf "$day  (%gh)\n" $time
 
         lines=( ${(s::Q)daytext[$day]} )
         for n in $lines ; do 

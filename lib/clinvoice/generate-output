@@ -156,8 +156,7 @@ function run_script() {
 vars[lastdate]=$(strftime -r "%Y.%m.%d" ${${(o)${(k)dayhours}}[-1]})
 vars[sequence]=${gen_seq:-1}
 vars[today]=$(date +%s)
-vars[totalhours]=0
-vars[subtotalcost]=0
+vars[totalhours]=
 vars[hourlyrate]=${conf[contract.hourly-rate]}
 
 local tax=${conf[contract.tax]}
@@ -170,13 +169,13 @@ for day in ${(k)dayhours} ; do
         local -F hours=${dayhours[$day]}
         vars[daycost]=$cost
 
-        local -F tmp=${vars[totalhours]}
+        local -F tmp=${vars[totalhours]:-0}
         let "tmp = $tmp + $hours"
         vars[totalhours]=$tmp
 
 done
 
-local -F hours=${vars[totalhours]}
+local -F hours=${vars[totalhours]:-0}
 local -F rate=${vars[hourlyrate]}
 let "cost = $hours * $rate"
 vars[subtotalcost]=$cost
