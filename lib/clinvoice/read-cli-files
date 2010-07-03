@@ -95,6 +95,12 @@ function read_data_file() {
                 elif [[ "$line" =~ "^\s*([^=]+)\s*=\s*(.*)$" ]] ; then
                         [[ $matching -eq 1 ]] && update_entries $day ${match[1]} ${match[2]}
 
+                elif [[ "$line" =~ "^\s*$" ]] ; then
+                        # nothing
+
+                else
+                        die "don't know how to handle this line in $file:\n$line"
+
                 fi
         done < "$file"
 }
