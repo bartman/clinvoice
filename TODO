@@ -1,0 +1,44 @@
+# About
+
+This file just captures some TODO items.
+
+# The list
+
+* implement `cli add` command:
+
+  - `cli add [ --on <datespec> ] <hours> [ <description> ]`
+  
+    adds a new entry under `<datespec>` (or today if not specified) for
+    specified `<hours>`.  If `<description>` is not specified it opens
+    `$EDITOR` to get one.
+
+  - `cli add [+|-]<hours>`
+  
+    increments or decrements the last entry by given number of hours.
+
+
+* implement `cli task` interface:
+
+  - `cli task start <description>`
+  
+    starts a new task with given `<description>`.  The intent, and start time
+    is stored in a temporary `.cli/task`.  There can only be one such task
+    per project.
+
+  - `cli task [ show ]`
+  
+    reports on current task.  Description, start time, duration.
+
+  - `cli task end [ <hours> ]`
+  
+    ends the task adding the entry to the `.cli` file.  If `<hours>` is not
+    given, it computes it from the start time.
+
+  - should have some `.cliconfig` variable for rounding decisions.
+    
+    I personally like "round up to first hour, down to half hour after".
+    Maybe that could be encoded in some "minimum task billing period" and
+    "round down to" variable pair.
+
+
+<!-- vim: set ft=mkd tw=78 et sw=2 -->
