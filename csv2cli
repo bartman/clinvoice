@@ -1,0 +1,158 @@
+#!/bin/zsh
+# Copyright (c) 2010 Bart Trojanowski <bart@jukie.net>
+#
+# This script is useful if you already have access to a redmine project tracker
+# and want to convert the data to cli files.  Just export the redmine timesheet
+# as CSV and use this scrpt to convert it into a CLI file.
+#
+#     csv2cli 2010-07.csv
+#     # 2010-07.csv -> 2010-07.cli
+#
+# The first line of the file is expected to contian headers like this:
+#         #,Date,Member,Activity,Project,Issue,Issue Subject,Comment,Hours
+# these are parsed and used to pull out the bits from the data lines that follow.
+#
+
+set -e
+
+die() {
+        echo >&2 "$@"
+        exit 1
+}
+
+help() {
+        local err=${1:-0}
+        echo >&2 "Convert .csv files to .cli files"
+        echo >&2 "$0 [-h] [-f] [-o <cli-file>] <csv-file>"
+        exit $err
+}
+
+FORCE=
+
+while [[ -n $1 && ${1[1]} = '-' ]] ; do
+        cmd=$1 ; shift
+        case "$cmd" in
+            --debug)
+                set -x
+                ;;
+            -h|--help)
+                help 0
+                ;;
+            -o)
+                OUT=$1
+                shift || die "option -o requires an argument"
+                ;;
+            -f)
+                FORCE=y
+                ;;
+            *)
+                die "unkonw option $cmd"
+                ;;
+        esac
+done
+
+[[ -n $1 ]] || help 1
+IN=$1
+
+[[ -f $IN ]] || die "input file, $IN, doesn't exist"
+
+[[ -z $OUT ]] && OUT=${IN%.csv}.cli
+[[ -f $OUT && -z $FORCE ]] && die "output file, $OUT, exists; use -f to force."
+
+echo >&2 "# $IN -> $OUT"
+
+declare -a parts
+tokenizeCSV() {
+        local input="$1"
+        local -a tmp
+        tmp=(${(s:,:)input})
+
+        parts=()
+        local quoted=false
+        local accumulator=
+        for ((n=1; $n<=${#tmp}; n++)) ; do
+                local part="${tmp[$n]}"
+                local add=false
+                if $quoted ; then
+                        if [[ "${part[-1]}" = '"' ]] ; then
+                                quoted=false
+                                part="${part%\"}"
+                                add=true
+                        fi
+                        part="$accumulator,$part"
+                else
+                        if [[ "${part[1]}" = '"' ]] ; then
+                                quoted=true
+                                part="${part#\"}"
+                        else
+                                add=true
+                        fi
+                fi
+                if $add ; then
+                        accumulator=
+                        parts+="$part"
+                        #print -r "${#parts} : $part"
+                else
+                        accumulator+="$part"
+                fi
+        done
+}
+
+declare -A name2col
+
+integer ifd
+integer ofd
+exec {ifd}<$IN
+exec {ofd}>$OUT
+
+#echo i=$ifd o=$ofd
+
+read -r line <&$ifd
+#echo "#1# $line"
+tokenizeCSV $line
+
+for ((n=2; $n<=${#parts}; n++)) ; do
+        part=${${parts[$n]}// /}
+        let "name2col[$part] = $n"
+        #echo "$n $part"
+done
+
+idxDate=${name2col[Date]}
+idxProject=${name2col[Project]}
+idxIssue=${name2col[Issue]}
+idxSubject=${name2col[IssueSubject]}
+idxComment=${name2col[Comment]}
+idxHours=${name2col[Hours]}
+
+num=1
+lastdate=
+while read -r line ; do
+        let "num = $num + 1"
+        #echo "#$num# $line"
+        tokenizeCSV $line
+
+        date="${parts[$idxDate]}"
+        proj="${parts[$idxProject]}"
+        issu="${parts[$idxIssue]}"
+        subj="${parts[$idxSubject]}"
+        cmnt="${parts[$idxComment]}"
+        hour="${parts[$idxHours]}"
+
+       #echo
+       #echo "date $date"
+       #echo "proj $proj"
+       #echo "issu $issu"
+       #echo "subj $subj"
+       #echo "cmnt $cmnt"
+       #echo "hour $hour"
+
+        if [[ "$lastdate" != "$date" ]] ; then
+                [[ -n "$lastdate" ]] && echo >&$ofd
+                echo >&$ofd "$date"
+        fi
+        lastdate="$date"
+
+        echo >&$ofd "  ${hour}h = $cmnt (${proj// /} ${issu#*\#})"
+
+done<&$ifd
+
