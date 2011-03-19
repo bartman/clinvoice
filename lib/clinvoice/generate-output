@@ -13,7 +13,7 @@ zmodload zsh/pcre
 
 local mode=normal
 local -a script
-local after=
+local cli_cmd=
 local -A vars
 
 function process_line() {
@@ -27,11 +27,11 @@ function process_normal() {
                 local arg="${match[1]}"
                 local pre="${line%<cli$arg>*}"
                 local post="${line#*<cli$arg>}"
-                after=${arg# }
+                cli_cmd=${arg# }
 
                 printf >>$output "%s" "$pre"
 
-                if [[ -z "$after" ]] ; then
+                if [[ -z "$cli_cmd" ]] ; then
                         mode=script
                         process_script "$post"
                 else
@@ -53,7 +53,7 @@ function process_accumulate() {
 
                 script+=( "$pre" )
 
-                run_accumulated
+                run_accumulated "$cli_cmd"
 
                 mode=normal
                 process_normal "$post"
@@ -79,7 +79,8 @@ function process_script() {
 }
 
 function run_accumulated() {
-        case $after in
+        local cmd="$1"
+        case "$cmd" in
             for_each_day)
                 local -F rate=${vars[hourlyrate]}
                 vars[number]=0
@@ -113,14 +114,28 @@ function run_accumulated() {
                         done
                 done
                 ;;
+            for_each_discount)
+                vars[number]=0
+                for date in ${(o)${(k)discount_ttl_amt}} ; do
+                        amt=( ${(s::Q)discount_ttl_amt[$date]} )
+                        txt=( ${(s::Q)discount_ttl_txt[$date]} )
+                        for (( idx=1 ; idx <= ${#amt} ; idx++ )) ; do
+                                vars[text]="${txt[$idx]}"
+                                vars[cost]="${amt[$idx]}"
+                                for line in $script ; do
+                                        run_script "$line"
+                                done
+                        done
+                done
+                ;;
             *)
-                die "unknon <cli $after> expression"
+                die "unknon <cli $cmd> expression"
                 ;;
         esac
 }
 
 function run_script() {
-        local line=$1
+        local line="$1"
         local -a argv
         argv=( ${(Q)${(z)line}} )
         [[ $#argv = 0 ]] && return
