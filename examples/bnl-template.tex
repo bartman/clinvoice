@@ -1,12 +1,12 @@
 % this file is a sample template to be used for formatting your invoices
 
 \documentclass[letterpaper]{article}
-\addtolength{\oddsidemargin}{-2.5cm}
-\addtolength{\evensidemargin}{-2.5cm}
-\addtolength{\textwidth}{5.0cm}
+\addtolength{\oddsidemargin}{-3cm}
+\addtolength{\evensidemargin}{-3cm}
+\addtolength{\textwidth}{6cm}
 
-\addtolength{\topmargin}{-2.5cm}
-\addtolength{\textheight}{5.0cm}
+\addtolength{\topmargin}{-2cm}
+\addtolength{\textheight}{6cm}
 
 \begin{document}
 \thispagestyle{empty}
@@ -61,14 +61,14 @@ Prices calculated according to contract signed by the above parties.
 vars_printf '        %s & %s & %s & %g & %0.2f \\\\\n' number date text dayhours daycost
 </cli>	\hline
 	\multicolumn{4}{r}{ \textbf{Subtotal} } & <cli>
-            vars_printf '%0.2f' subtotalcost </cli> \\
-        \multicolumn{3}{c}{ <cli> 
-            vars_printf '%s' taxid
-            </cli> } & <cli>
-            vars_printf '%s %s' taxname taxpercent
-            </cli>\% & <cli>
-            vars_printf '%0.2f' taxcost </cli> \\
-	\hline
+            vars_printf '%0.2f' subtotalcost
+</cli> \\
+<cli> 
+vars_printf '         & & %s & %s %s\\%% & %0.2f ' taxid taxname taxpercent taxcost
+</cli> \\
+<cli for_each_discount>
+vars_printf '         & & %s &  & (%0.2f) \\\\\n' text cost
+</cli>	\hline
 	\multicolumn{4}{r}{ \textbf{Total} } & <cli>
             vars_printf '%0.2f' totalcost </cli> \\
 \end{tabular}
@@ -76,7 +76,9 @@ vars_printf '        %s & %s & %s & %g & %0.2f \\\\\n' number date text dayhours
 
 \subsection*{Notes}
 \begin{itemize}
-        \item Please make cheque payable to <cli> conf_ifdef_printf issuer.company '%s' </cli>
+        \item Please make cheque payable to <cli> conf_ifdef_printf issuer.company '%s' </cli><cli for_each_note>
+vars_printf '        \\item %s \n' text
+</cli>
 \end{itemize}
 
 \end{document}
