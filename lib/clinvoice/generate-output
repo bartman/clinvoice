@@ -155,6 +155,13 @@ function run_script() {
                 done
                 printf >>$output ${argv[2,-1]}
                 ;;
+            ifdef)
+                # ifdef <var> <command>
+                local var=${argv[2]}
+                [[ "$line" =~ "^\s*ifdef\s+$var\s+([^ ].+)$" ]] \
+                || die "template command parsing error on line...\n$line"
+                run_script "${match[1]}"
+                ;;
             vars_print_date)
                 # vars_print_date <format> <var>
                 # ... uses date formatting to print a date given a variable name

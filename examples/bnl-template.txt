@@ -40,6 +40,8 @@ No.  |  Date      |  Description                   | Hours   | Cost
         vars_printf '%s %s%%' taxname taxpercent
                                                       </cli> | <cli>
         vars_printf '%8.2f' taxcost
+</cli><cli>
+        ifdef totaldiscount vars_printf '\n                                       Discount    |       - |(%8.2f)' totaldiscount 
 </cli>
                                                    +---------+-----------
                                                        Total | <cli>
