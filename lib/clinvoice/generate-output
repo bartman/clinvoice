@@ -100,6 +100,19 @@ function run_accumulated() {
                         done
                 done
                 ;;
+            for_each_note)
+                vars[number]=0
+                for (( idx=1 ; idx <= ${#notes} ; idx++ )) ; do
+                        # setup the loop variables
+                        let "vars[number] = ${vars[number]} + 1"
+                        vars[text]="${notes[$idx]}"
+
+                        # now run the accumulated script
+                        for line in $script ; do
+                                run_script $line
+                        done
+                done
+                ;;
             *)
                 die "unknon <cli $after> expression"
                 ;;
@@ -175,17 +188,30 @@ for day in ${(k)dayhours} ; do
 
 done
 
+local -F subtotalcost=0
 local -F hours=${vars[totalhours]:-0}
 local -F rate=${vars[hourlyrate]}
-let "cost = $hours * $rate"
-vars[subtotalcost]=$cost
+let "subtotalcost = $hours * $rate"
+vars[subtotalcost]=$subtotalcost
 
 local -F taxcost=${vars[taxpercent]}
-let "taxcost = ( $taxcost * $cost ) / 100"
+let "taxcost = ( $taxcost * $subtotalcost ) / 100"
 vars[taxcost]=$taxcost
 
-let "cost = $cost + $taxcost"
-vars[totalcost]=$cost
+local -F totaldiscount=0
+if [[ ${#discount_ttl_amt} -gt 0 ]] ; then
+        for date in ${(o)${(k)discount_ttl_amt}} ; do
+                amt=( ${(s::Q)discount_ttl_amt[$date]} )
+                for (( idx=1 ; idx <= ${#amt} ; idx++ )) ; do
+                        let "totaldiscount += ${amt[$idx]}"
+                done
+        done
+fi
+vars[totaldiscount]=$totaldiscount
+
+local -F totalcost
+let "totalcost = $subtotalcost + $taxcost - $totaldiscount"
+vars[totalcost]=$totalcost
 
 # setup escaping
 local escape_word=escape_noop
@@ -212,6 +238,7 @@ function escape_latex() {
         txt=${txt//_/\\_}
         txt=${txt//&/\\&}
         txt=${txt//\%/\\%}
+        txt=${txt//\$/\\$}
         txt=${txt//^/\\^\{\}}
         txt=${txt//\~/\\~\{\}}
 

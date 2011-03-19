@@ -87,6 +87,8 @@ function update_time_entries() {
 function update_discount_entries() {
         local mode=$1 date=$2 amount=$3 text=$4
 
+        amount=${amount#\$}
+
         case $mode in
         total-discount) ;;
         *) die "unsupported discount mode $mode" ;;
