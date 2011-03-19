@@ -11,7 +11,7 @@ local    m_count=0
 
 function print_month() {
         [[ -z "$m_spec" ]] && return
-        printf "$month     %6g  (%d days)\n" $m_time $m_count
+        printf "$m_spec     %6g  (%d days)\n" $m_time $m_count
         let "ttl_cnt=$ttl_cnt+1"
 }
 
