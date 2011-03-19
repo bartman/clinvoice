@@ -3,6 +3,9 @@
 
 typeset -g log_format=
 
+arg_notes=false
+arg_discounts=false
+
 # parse local options
 while [[ -n "$1" && "${1[1]}" = "-" ]] ; do
         opt=$1 ; shift
@@ -16,6 +19,12 @@ while [[ -n "$1" && "${1[1]}" = "-" ]] ; do
                 ;;
             --format=*)
                 arg_format=${opt#--format=}
+                ;;
+            -n|--notes)
+                arg_notes=true
+                ;;
+            -d|--discounts)
+                arg_discounts=true
                 ;;
             *)
             die "unknown config option '$opt'"
@@ -46,3 +55,26 @@ read-cli-files $CLI_DIR/*.cli
 
 # dump the data
 $log_print
+
+# dump discounts
+if $arg_discounts && [[ ${#discount_ttl_amt} -gt 0 ]] ; then
+        echo
+        echo discounts
+        for date in ${(o)${(k)discount_ttl_amt}} ; do
+                amt=( ${(s::Q)discount_ttl_amt[$date]} )
+                txt=( ${(s::Q)discount_ttl_txt[$date]} )
+                for (( idx=1 ; idx <= ${#amt} ; idx++ )) ; do
+                        printf "%10s - $date - %s\n" "${amt[$idx]}" "${txt[$idx]}"
+                done
+        done
+fi
+
+# dump notes
+if $arg_notes && [[ ${#notes} -gt 0 ]] ; then
+        echo
+        echo notes
+        for (( idx=1 ; idx <= ${#notes} ; idx++ )) ; do
+                local txt="${notes[$idx]}"
+                echo "  $txt"
+        done
+fi

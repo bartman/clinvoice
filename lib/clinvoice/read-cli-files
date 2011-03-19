@@ -58,10 +58,13 @@ function calc_duration() {
         die "unrecognized time duration '$time'"
 }
 
-function update_entries() {
-        local day=$1 time=$2 text=$3
+function update_time_entries() {
+        local mode=$1 day=$2 time=$3 text=$4
         local dur=$(calc_duration $time)
 
+        [[ $mode = date ]] || die "unsupported mode $mode"
+
+        # entries are separated by ^C character
         daytext[$day]="${daytext[$day]}$text"
 
         local -F tmp=${dayhours[$day]:-0}
@@ -81,19 +84,65 @@ function update_entries() {
         yearhours[$year]=$tmp
 }
 
+function update_discount_entries() {
+        local mode=$1 date=$2 amount=$3 text=$4
+
+        case $mode in
+        total-discount) ;;
+        *) die "unsupported discount mode $mode" ;;
+        esac
+
+        discount_ttl_amt[$date]="${discount_ttl_amt[$day]}$amount"
+        discount_ttl_txt[$date]="${discount_ttl_txt[$day]}$text"
+}
+
+function update_note_entries() {
+        local mode=$1 day=$2 text=$3
+
+        case $mode in
+        notes) ;;
+        *) die "unsupported note mode $mode" ;;
+        esac
+
+        local idx=$(( ${#notes} + 1 ))
+        notes[$idx]="$text"
+}
+
 function read_data_file() {
         local file="$1"
         local day=
         local matching=0
+        local mode=
         while read line ; do
                 #echo "# $line"
                 if [[ "$line" =~ "^\s*(20[0-9]{2})[./\s-]*([01][0-9])[./\s-]*([0-3][0-9])\s*$" ]] ; then
                         day="${match[1]}.${match[2]}.${match[3]}"
                         test_day_against_datespec $day
                         matching=$?
+                        mode=date
 
-                elif [[ "$line" =~ "^\s*([^=]+)\s*=\s*(.*)$" ]] ; then
-                        [[ $matching -eq 1 ]] && update_entries $day ${match[1]} ${match[2]}
+                elif [[ "$line" =~ "^\s*(20[0-9]{2})[./\s-]*([01][0-9])\s+([a-z].*)\s*$" ]] ; then
+                        day="${match[1]}.${match[2]}."
+                        test_day_against_datespec $day
+                        matching=$?
+                        mode="${match[3]}"
+                        case "$mode" in
+                            total-discount) ;;
+                            subtotal-discount) ;;
+                            notes) ;;
+                            *)
+                                die "don't know how to handle this line in $file:\n$line"
+                                ;;
+                        esac
+
+                elif [[ "$mode" = "date" ]] && [[ "$line" =~ "^\s*([^=]+)\s*=\s*(.+)\s*$" ]] ; then
+                        [[ $matching -eq 1 ]] && update_time_entries $mode $day ${match[1]} ${match[2]}
+
+                elif [[ "$mode" =~ "^.*-discount$" ]] && [[ "$line" =~ "^\s*([^= ]+)\s*=\s*(.+)\s*$" ]] ; then
+                        [[ $matching -eq 1 ]] && update_discount_entries $mode $day ${match[1]} ${match[2]}
+
+                elif [[ "$mode" = "notes" && "$line" =~ "^\s*(.+)\s*$" ]] ; then
+                        [[ $matching -eq 1 ]] && update_note_entries $mode $day ${match[1]}
 
                 elif [[ "$line" =~ "^\s*$" ]] ; then
                         # nothing
@@ -109,6 +158,8 @@ declare -g -A daytext
 declare -g -A dayhours
 declare -g -A monthhours
 declare -g -A yearhours
+declare -g -A discount_ttl_amt
+declare -g -A discount_ttl_txt
 
 for file in $* ; do
         [[ -r "$file" ]] || die "unable to read file '$file'"

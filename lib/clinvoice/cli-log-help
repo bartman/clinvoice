@@ -13,6 +13,8 @@ cli log [options...] [ <date spec> ]
 Options:
 
  -f --format=<format>   - select output format
+ -d --discounts         - show discounts
+ -n --notes             - show notes
 
 Formats:
 
