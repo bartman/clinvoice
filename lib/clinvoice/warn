@@ -1,5 +1,4 @@
 #autoload -U
 #vim: set ft=zsh 
 
-echo >&2 "ERROR: $@"
-exit 1
+echo >&2 "WARNING: $@"
