@@ -41,6 +41,9 @@ done
 
 read-config
 
+# if one was not given, check for default generator
+[[ -n "$arg_type" ]] || arg_type="${conf[default.generator]}"
+
 # validate the type argument
 [[ -n "$arg_type" ]] || die "you must specify an output type"
 [[ -n "${conf[generator.$arg_type.template]}" && -n "${conf[generator.$arg_type.output]}" ]] \

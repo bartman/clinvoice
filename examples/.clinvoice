@@ -17,6 +17,9 @@
     tax         = VAT 10%
     taxid       = my tax number 12345
 
+[default]
+    generator   = pdf
+
 [generator "latex"]
     # template file to read in to generate output
     template    = bnl-template.tex

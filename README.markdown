@@ -48,6 +48,9 @@ Here is what you'd find in a project config file:
         hourly-rate = 50
         tax         = HST 13%
 
+    [default]
+        generator   = pdf
+
     [generator "latex"]
         # template file to read in to generate output
         template    = bnl-template.tex
