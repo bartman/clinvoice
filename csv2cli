@@ -32,22 +32,22 @@ FORCE=
 while [[ -n $1 && ${1[1]} = '-' ]] ; do
         cmd=$1 ; shift
         case "$cmd" in
-            --debug)
-                set -x
-                ;;
-            -h|--help)
-                help 0
-                ;;
-            -o)
-                OUT=$1
-                shift || die "option -o requires an argument"
-                ;;
-            -f)
-                FORCE=y
-                ;;
-            *)
-                die "unkonw option $cmd"
-                ;;
+                --debug)
+                        set -x
+                        ;;
+                -h|--help)
+                        help 0
+                        ;;
+                -o)
+                        OUT=$1
+                        shift || die "option -o requires an argument"
+                        ;;
+                -f)
+                        FORCE=y
+                        ;;
+                *)
+                        die "unkonw option $cmd"
+                        ;;
         esac
 done
 
@@ -82,8 +82,14 @@ tokenizeCSV() {
                         part="$accumulator,$part"
                 else
                         if [[ "${part[1]}" = '"' ]] ; then
-                                quoted=true
-                                part="${part#\"}"
+                                if [[ "${part[-1]}" = '"' ]] ; then
+                                        part="${part#\"}"
+                                        part="${part%\"}"
+                                        add=true
+                                else
+                                        quoted=true
+                                        part="${part#\"}"
+                                fi
                         else
                                 add=true
                         fi
@@ -111,7 +117,7 @@ read -r line <&$ifd
 #echo "#1# $line"
 tokenizeCSV $line
 
-for ((n=2; $n<=${#parts}; n++)) ; do
+for ((n=1; $n<=${#parts}; n++)) ; do
         part=${${parts[$n]}// /}
         let "name2col[$part] = $n"
         #echo "$n $part"
@@ -138,13 +144,13 @@ while read -r line ; do
         cmnt="${parts[$idxComment]}"
         hour="${parts[$idxHours]}"
 
-       #echo
-       #echo "date $date"
-       #echo "proj $proj"
-       #echo "issu $issu"
-       #echo "subj $subj"
-       #echo "cmnt $cmnt"
-       #echo "hour $hour"
+        #echo
+        #echo "date $date"
+        #echo "proj $proj"
+        #echo "issu $issu"
+        #echo "subj $subj"
+        #echo "cmnt $cmnt"
+        #echo "hour $hour"
 
         if [[ "$lastdate" != "$date" ]] ; then
                 [[ -n "$lastdate" ]] && echo >&$ofd
