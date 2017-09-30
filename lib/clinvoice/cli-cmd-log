@@ -50,7 +50,23 @@ while [[ -n "$1" ]] ; do
 done
 
 # if there is no date spec, use today
-[[ $#datespec = 0 ]] && datespec=( $(date '+%Y.%m.%d') )
+if [[ $#datespec = 0 ]] ; then
+        case "$arg_format" in
+                year)
+                        datespec=( '20' )
+                        ;;
+                month)
+                        datespec=( $(date '+%Y') )
+                        ;;
+                day)
+                        datespec=( $(date '+%Y.%m') )
+                        ;;
+                *)
+                        datespec=( $(date '+%Y.%m.%d') )
+                        ;;
+        esac
+echo datespec=$datespec
+fi
 
 # read in all the data
 read-cli-files $CLI_DIR/*.cli
