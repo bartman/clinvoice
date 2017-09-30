@@ -18,8 +18,7 @@ Options:
 
 Formats:
 
- full     - print everything
- default  - daily itemized output
+ full  - daily itemized output (default)
  day      - daily summary
  month    - monthly summary
  year     - anual summary

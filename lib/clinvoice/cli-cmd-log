@@ -35,7 +35,7 @@ while [[ -n "$1" && "${1[1]}" = "-" ]] ; do
 done
 
 # validate the format argument
-log_print=cli-log-format-default
+log_print=cli-log-format-full
 [[ -n "$arg_format" ]] && log_print="cli-log-format-$arg_format"
 ( whence -w "$log_print" >/dev/null 2>&1 ) || die "unknown format '$arg_format'"
 
