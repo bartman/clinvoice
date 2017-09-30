@@ -8,10 +8,10 @@ local total=0
 for day in ${(o)${(k)dayhours}} ; do
         local time=${dayhours[$day]}
 
-        printf "$day  %6g\n" $time
+        printf "%s%s%s  %s%6.1f%s\n" $(blue) $day $(reset) $(green) $time $(reset)
 
         let "total=$total + $time"
 done
 
-printf "Total:      %6.1f\n" $total
+printf "%sTotal:%s      %s%6.1f%s\n" $(red) $(reset) $(green) $total $(reset)
 

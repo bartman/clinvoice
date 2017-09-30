@@ -11,7 +11,10 @@ local    m_count=0
 
 function print_month() {
         [[ -z "$m_spec" ]] && return
-        printf "$m_spec     %6g  (%d days)\n" $m_time $m_count
+        printf "%s%s%s     %s%6.1f%s  (%s%d days%s)\n" \
+                $(blue) $m_spec $(reset) \
+                $(green) $m_time $(reset) \
+                $(yellow) $m_count $(reset)
         let "ttl_cnt=$ttl_cnt+1"
 }
 
@@ -38,4 +41,4 @@ done
 # print the last entry
 print_month
 
-[[ $ttl_cnt -gt 1 ]] && printf "Total:      %6g\n" $ttl_time
+[[ $ttl_cnt -gt 1 ]] && printf "%sTotal:%s      %s%6.1f%s\n" $(red) $(reset) $(green) $ttl_time $(reset)

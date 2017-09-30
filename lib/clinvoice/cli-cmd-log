@@ -3,6 +3,8 @@
 
 typeset -g log_format=
 
+init-color
+
 arg_notes=false
 arg_discounts=false
 
