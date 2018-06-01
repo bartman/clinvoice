@@ -1,0 +1,180 @@
+#!/usr/bin/perl -w
+use strict;
+# Copyright (c) 2010 Bart Trojanowski <bart@jukie.net>
+#
+# This script is useful if you already have access to a redmine project tracker
+# and want to convert the data to cli files.  Normally, you could use the CVS
+# export feature of Redmine, but one day that didn't work.  So here is an HTML
+# importer.
+#
+#     redminehtml2cli 2018-05.html
+#     # 2010-07.csv -> 2010-07.cli
+#
+
+use Getopt::Long;
+
+
+sub help {
+        my ($err) = (@_);
+        my $msg = "Convert redmine .html files to .cli files\n"
+                . "$^X [-h] [-f] [-o <cli-file>] -i <html-file>\n";
+        die $msg if $err;
+        print $msg;
+        exit(0);
+}
+
+my $force = 0;
+my $output;
+my $input;
+GetOptions("help|h" => sub { help(0) },
+           "force|f" => \$force,
+           "output|o=s" => \$output,
+           "input|i=s" => \$input
+);
+
+die "need to provide input file\n" if not $input;
+
+if (not $output) {
+        $output = $input;
+        $output =~ s/\.html//;
+        $output .= '.cli';
+}
+
+die "$output: already exists, use -f to force\n" if -e $output and not $force;
+
+# -----
+
+sub reader {
+        my ($infile) = @_;
+        open(IN,"<$infile") or die "$infile failed to open for reading\n";
+
+        my $found_table;
+        my $time_entry;
+        my $skip_span;
+        my $td_index;
+        my $desc = [];
+
+        return sub {
+                while(<IN>) {
+                        chomp;
+                        #print "# $_\n";
+
+                        if (not $found_table) {
+                                next if not m,\<table class="list issues"\>,;
+                                $found_table = 1;
+                                next;
+                        }
+
+                        if (m,</table>,) {
+                                $found_table = 0;
+                                next;
+                        }
+
+                        if (m,\<tr id="([^"]+)" class="time_entry.*"\>,) {
+                                $time_entry = $1;
+                                $desc = [];
+                                $td_index = 0;
+                                next;
+                        }
+
+                        next if not $time_entry;
+
+                        $td_index++ if m,\<td.*\>,;
+                        
+                        if (m,\<td align="center"\>([^<]*)\</td\>,) {
+                                push @$desc, $1;
+                                next;
+                        }
+
+                        if (m,\<span class="tip"\>,) {
+                                $skip_span = 1;
+                                next;
+                        }
+                        if (m,\</span\>,) {
+                                $skip_span = 0;
+                                next;
+                        }
+                        next if $skip_span;
+
+                        if (m,\<a class="([^"]*)" href="/issues/(\d+)"\>([^<]*)\</a\>: (.*),) {
+                                #my $flags = $1;
+                                my $issue = $2;
+                                #my $issue_id = $3;
+                                #my $issue_desc = $4;
+                                push @$desc, $issue;
+                        }
+
+                        if (m,\<td\>([^<]*)\</td\>,) {
+                                if ($td_index != 9) {
+                                        die "td_index=$td_index, expected 9";
+                                }
+                                push @$desc, $1;
+                        }
+
+                        if (m,\<td align="center"\>\<strong\>([0-9.]+)\</strong\>\</td\>,) {
+                                if ($td_index != 10) {
+                                        die "td_index=$td_index, expected 10";
+                                }
+                                push @$desc, $1;
+                        }
+
+                        if (m,^\s*\</tr\>\s*$,) {
+                                my $ret = $desc;
+                                undef $time_entry;
+                                undef $desc;
+                                undef $skip_span;
+                                undef $td_index;
+                                return $ret;
+                        }
+
+                        #return $_;
+                }
+        }
+}
+
+sub writer {
+        my ($outfile) = @_;
+        open(OUT,">$output") or die "$output failed to open for writing\n";
+
+        my $lastdate = '';
+
+        return sub {
+                my ($e) = @_;
+
+                my ($date,
+                    $who,
+                    $issue_type,
+                    $work_type,
+                    $project,
+                    $target,
+                    $issue,
+                    $comment,
+                    $hours) = @$e;
+
+                if ("$lastdate" ne "$date") {
+                        print OUT "\n" if length($lastdate);
+                        print OUT "$date\n";
+                }
+                $lastdate = $date;
+
+                $project =~ s/ +//g;
+                $hours =~ s/0+$//;
+                $hours =~ s/\.$//;
+
+                print OUT "  ${hours}h = $comment ($project $issue)\n"
+        }
+}
+
+# -----
+
+print "# $input -> $output\n";
+my $r = reader($input);
+my $w = writer($output);
+
+while (my $e = $r->()) {
+        #print "---\n";
+        #print (join ",", @$e);
+        #print "\n";
+        $w->($e);
+}
+
