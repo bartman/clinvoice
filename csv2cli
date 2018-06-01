@@ -56,8 +56,12 @@ IN=$1
 
 [[ -f $IN ]] || die "input file, $IN, doesn't exist"
 
-[[ -z $OUT ]] && OUT=${IN%.csv}.cli
-[[ -f $OUT && -z $FORCE ]] && die "output file, $OUT, exists; use -f to force."
+if [[ $OUT = '-' ]] ; then
+        OUT=/dev/stdout
+else
+        [[ -z $OUT ]] && OUT=${IN%.csv}.cli
+        [[ -f $OUT && -z $FORCE ]] && die "output file, $OUT, exists; use -f to force."
+fi
 
 echo >&2 "# $IN -> $OUT"
 
