@@ -49,6 +49,15 @@ function calc_duration() {
         elif [[ $time =~ "^\s*([0-9.]+)m?\s*$" ]] ; then
                 die "don't support duration expressed in minutes"
 
+        elif [[ $time =~ "^\s*([0-9]{1,2})\s*-\s*([0-9]{1,2})\s*$" ]] ; then
+
+                let "t1 = ${match[1]}"
+                let "t2 = ${match[2]}"
+                let "duration = $t2 - $t1"
+
+                echo $duration
+                return 0
+
         elif [[ $time =~ "^\s*([0-9]{1,2}):([0-5][0-9])\s*-\s*([0-9]{1,2}):([0-5][0-9])\s*$" ]] ; then
 
                 let "t1 = (${match[1]} * 60) + ${match[2]}"
