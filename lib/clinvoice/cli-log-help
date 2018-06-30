@@ -18,7 +18,7 @@ Options:
 
 Formats:
 
- full  - daily itemized output (default)
+ full     - daily itemized output (default)
  day      - daily summary
  month    - monthly summary
  year     - anual summary

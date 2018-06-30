@@ -51,21 +51,23 @@ done
 
 # if there is no date spec, use today
 if [[ $#datespec = 0 ]] ; then
+        local opt=
         case "$arg_format" in
                 year)
-                        datespec=( '20' )
+                        opt='20'
                         ;;
                 month)
-                        datespec=( $(date '+%Y') )
+                        opt=$(date '+%Y')
                         ;;
                 day)
-                        datespec=( $(date '+%Y.%m') )
+                        opt=$(date '+%Y.%m')
                         ;;
                 *)
-                        datespec=( $(date '+%Y.%m.%d') )
+                        opt=$(date '+%Y.%m.%d')
                         ;;
         esac
-echo datespec=$datespec
+        local spec=$(normalize-datespec "$opt")
+        datespec=( $spec )
 fi
 
 # read in all the data
