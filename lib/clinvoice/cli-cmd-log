@@ -3,7 +3,27 @@
 
 typeset -g log_format=
 
-init-color
+autoload -U colors
+init-color || {
+        if [ -t 1 ] ; then
+                # color() functions take on color index and optionally 1 to indicate bright
+                color_fg() { local col=$1 ; [ "$2" = 1 ] && col=$(( col+8 )) ; printf '\e[38;5;%dm' $col ; }
+                color_bg() { local col=$1 ; [ "$2" = 1 ] && col=$(( col+8 )) ; printf '\e[48;5;%dm' $col ; }
+                reset()    { printf '\e[m' }
+        else
+                color_fg() { : }
+                color_bg() { : }
+                reset()    { : }
+        fi
+        black()   { color_fg 0 $1 }
+        red()     { color_fg 1 $1 }
+        green()   { color_fg 2 $1 }
+        yellow()  { color_fg 3 $1 }
+        blue()    { color_fg 4 $1 }
+        magenta() { color_fg 5 $1 }
+        cyan()    { color_fg 6 $1 }
+        white()   { color_fg 7 $1 }
+}
 
 arg_notes=false
 arg_discounts=false
