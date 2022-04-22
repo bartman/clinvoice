@@ -40,7 +40,12 @@ function test_day_against_datespec() {
 }
 
 function calc_duration() {
-        local time=$1
+        local times=$1
+        local duration=0
+
+        local split=( ${(@s/,/)times} )
+
+        for time in ${split[@]} ; do
 
         if [[ $time =~ "^\s*([0-9.]+)h?\s*$" ]] ; then
                 echo ${match[1]}
@@ -53,33 +58,53 @@ function calc_duration() {
 
                 let "t1 = ${match[1]}"
                 let "t2 = ${match[2]}"
-                let "duration = $t2 - $t1"
+                let "duration += $t2 - $t1"
 
-                echo $duration
-                return 0
+                continue
 
-        elif [[ $time =~ "^\s*([0-9]{1,2}):([0-5][0-9])\s*-\s*([0-9]{1,2}):([0-5][0-9])\s*$" ]] ; then
+#       elif [[ $time =~ "^\s*([0-9]{1,2}):([0-5][0-9])\s*-\s*([0-9]{1,2}):([0-5][0-9])\s*$" ]] ; then
 
-                let "t1 = (${match[1]} * 60) + ${match[2]}"
-                let "t2 = (${match[3]} * 60) + ${match[4]}"
+#               let "t1 = (${match[1]} * 60) + ${match[2]}"
+#               let "t2 = (${match[3]} * 60) + ${match[4]}"
+
+#               let "delta = $t2 - $t1"
+
+#               let -F "hrs = $delta / 60"
+#               let -F "min = $delta % 60"
+
+#               let "duration += $hrs + ( $min / 60 )"
+
+#               continue
+
+        elif [[ $time =~ "^\s*([0-9]{1,2})(:([0-5][0-9]))?\s*-\s*([0-9]{1,2})(:([0-5][0-9]))?\s*$" ]] ; then
+
+                let "t1 = (${match[1]} * 60) + ${match[3]:-0}"
+                let "t2 = (${match[4]} * 60) + ${match[6]:-0}"
 
                 let "delta = $t2 - $t1"
 
                 let -F "hrs = $delta / 60"
                 let -F "min = $delta % 60"
 
-                let "duration = $hrs + ( $min / 60 )"
+                let "duration += $hrs + ( $min / 60. )"
 
-                echo $duration
-                return 0
+                continue
+        else
+
+                die "unrecognized time duration '$time'"
         fi
 
-        die "unrecognized time duration '$time'"
+        done
+
+        echo $duration
+        return 0
 }
 
 function update_time_entries() {
         local mode=$1 day=$2 time=$3 text=$4
+
         local dur=$(calc_duration $time)
+        [[ -z $dur ]] && die "failed to compute duration"
 
         [[ $mode = date ]] || die "unsupported mode $mode"
 
@@ -150,7 +175,10 @@ function read_data_file() {
         while read line ; do
                 let "line_no ++"
                 #echo "# $line"
-                if [[ "$line" =~ "^\s*(20[0-9]{2})[./\s-]*([01][0-9])[./\s-]*([0-3][0-9])\s*$" ]] ; then
+                if [[ "$line" =~ "^\s*#" ]] ; then
+                        # comment
+
+                elif [[ "$line" =~ "^\s*(20[0-9]{2})[./\s-]*([01][0-9])[./\s-]*([0-3][0-9])\s*$" ]] ; then
                         day="${match[1]}.${match[2]}.${match[3]}"
                         test_day_against_implied_datespec "$file" "$line_no" "$implied_datespec" "$day"
                         test_day_against_datespec $day
