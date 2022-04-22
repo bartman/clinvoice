@@ -4,7 +4,7 @@
 typeset -g log_format=
 
 autoload -U colors
-init-color || {
+init-color 2>/dev/null || {
         if [ -t 1 ] ; then
                 # color() functions take on color index and optionally 1 to indicate bright
                 color_fg() { local col=$1 ; [ "$2" = 1 ] && col=$(( col+8 )) ; printf '\e[38;5;%dm' $col ; }
