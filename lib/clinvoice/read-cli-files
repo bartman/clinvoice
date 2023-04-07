@@ -48,8 +48,8 @@ function calc_duration() {
         for time in ${split[@]} ; do
 
         if [[ $time =~ "^\s*([0-9.]+)h?\s*$" ]] ; then
-                echo ${match[1]}
-                return 0
+                let "duration +=  ${match[1]}"
+                continue
 
         elif [[ $time =~ "^\s*([0-9.]+)m?\s*$" ]] ; then
                 die "don't support duration expressed in minutes"
