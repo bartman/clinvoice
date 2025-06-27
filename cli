@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env zsh
 # Copyright (c) 2010 Bart Trojanowski <bart@jukie.net>
 
 # CLI uses autoload to load functions defined in a lib subdirectory.
